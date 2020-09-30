@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from X_D import X_D
-from FrankeFunction import FrankeFunction
 from sklearn.utils import resample
 from functions import beta_,mean_squared_error,R2,FrankeFunction,var
 import numpy as np
