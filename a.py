@@ -66,7 +66,6 @@ def OLS(x,y,z,degree,noise,z_star):
     z_train = np.ravel(z_train)
     z_test = np.ravel(z_test)
 
-
     MSE_minimum = 10      #The highest MSE we'll allow
     for i in range(1,degree+1):
         print("Degree = %.3f"%i)
@@ -90,9 +89,11 @@ def OLS(x,y,z,degree,noise,z_star):
 
         if MSE_test[i-1] < MSE_minimum:
             ztilde_best = np.reshape(z_tilde_scaled_test,(x_test.shape[0],x_test.shape[1]))
+            beta_best = beta_scaled
             MSE_minimum = MSE_test[i-1]
+            i_best = i
 
-    return MSE_train,MSE_test,beta_scaled,std_beta,x_test,y_test,ztilde_best
+    return MSE_train,MSE_test,beta_best,std_beta,x_test,y_test,ztilde_best,i_best
 
 if __name__ == '__main__':
 
