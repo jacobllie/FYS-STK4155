@@ -33,26 +33,27 @@ def ridge(x,y,z,k,B,lambda_,degree):
         MSE_ridge_cross,_,_,min_error_cross[i] = cross_validation(k,x,y,z,degree,"ridge",lambdas)
         ridge_heatmap_cross[i] = MSE_ridge_cross
         degree_index_cross[i] = deg[np.argmin(MSE_ridge_cross)]
-        """
-        plt.subplot(211)
-        plt.title("MSE with %.f bootstraps and lambda %.5f"%(B,lambdas))
-        plt.xlabel("Complexity")
-        plt.ylabel("MSE")
-        plt.plot(deg,MSE_boot,label="MSE bootstrap")
-        plt.plot(deg,bias_boot,label="bias")
-        plt.plot(deg,variance_boot,label="variance")
-        plt.legend()
-        plt.subplot(212)
+
+        #plt.subplot(211)
+        #plt.title("MSE with %.f bootstraps and lambda %.5f"%(B,lambdas))
+        #plt.xlabel("Complexity")
+        #plt.ylabel("MSE")
+        #plt.plot(deg,MSE_ridge_boot,label="MSE bootstrap")
+        #plt.plot(deg,bias_boot,label="bias")
+        #plt.plot(deg,variance_boot,label="variance")
+        #plt.show()
+
+        #plt.subplot(212)
         plt.title("MSE with %.2f K folds and lambda %.5f"%(k,lambdas))
         plt.xlabel("Complexity")
         plt.ylabel("MSE")
-        plt.plot(deg,MSE_cross,label="MSE cross validation")
+        plt.plot(deg,MSE_ridge_cross,label="{:.3}".format(lambdas))
         plt.legend()
-        plt.show()
-        """
+        #plt.show()
+
         i += 1
 
-
+    plt.show()
     return min_error_boot,min_error_cross,degree_index_boot,degree_index_cross,ridge_heatmap_boot,ridge_heatmap_cross
 
 if __name__ == '__main__':
@@ -66,14 +67,14 @@ if __name__ == '__main__':
     noise = 0.01*np.random.randn(n,n)
     z = np.ravel(FrankeFunction(x,y)+noise)
 
-    degree = 20
+    degree = 30
     deg = np.linspace(1,degree,degree)
     R2_score = np.zeros(degree)
     MSE_ridge_boot = np.zeros(degree)
     MSE_ridge_cross = np.zeros(degree)
     lambda_ = np.array([1e-4,1e-3,1e-2,1e-1,1])
 
-
+    
     k = 5
     B = 10
 
@@ -85,20 +86,20 @@ if __name__ == '__main__':
     print("----------Cross validation---------")
     print("The best error with %.2f folds and lambda %.5f and degree = %.2f"%(k,lambda_[np.argmin(min_error_cross)],degree_index_cross[np.argmin(min_error_cross)]))
     print(np.min(min_error_cross))
-    diff = np.min(min_error_boot)/np.min(min_error_cross)
+    diff = np.min(min_error_cross)/np.min(min_error_boot)
     print("Cross validation was {:.3} better".format(diff))
 
 
-    heatmap = sb.heatmap(ridge_heatmap_boot,annot=True,cmap="viridis_r",yticklabels=lambda_,cbar_kws={'label': 'Mean squared error'})
-    heatmap.set_xlabel("Complexity")
-    heatmap.set_ylabel("$\lambda$")
+    heatmap = sb.heatmap(ridge_heatmap_boot.T,annot=True,cmap="viridis_r",xticklabels=lambda_,cbar_kws={'label': 'Mean squared error'})
+    heatmap.set_xlabel("$\lambda$")
+    heatmap.set_ylabel("Complexity")
     heatmap.invert_yaxis()
     heatmap.set_title("Heatmap made from {:} bootstraps".format(B))
     plt.show()
 
-    heatmap = sb.heatmap(ridge_heatmap_cross,annot=True,cmap="viridis_r",yticklabels=lambda_,cbar_kws={'label': 'Mean squared error'})
-    heatmap.set_xlabel("Complexity")
-    heatmap.set_ylabel("$\lambda$")
+    heatmap = sb.heatmap(ridge_heatmap_cross.T,annot=True,cmap="viridis_r",xticklabels=lambda_,cbar_kws={'label': 'Mean squared error'})
+    heatmap.set_xlabel("$\lambda$")
+    heatmap.set_ylabel("Complexity")
     heatmap.invert_yaxis()
     heatmap.set_title("Heatmap made from {:} folds in cross validation".format(k))
     plt.show()

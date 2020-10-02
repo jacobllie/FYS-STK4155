@@ -7,18 +7,22 @@ from c import cross_validation
 from d import ridge
 from e import lasso
 import seaborn as sb
-
+from matplotlib.pyplot import cm
+from sklearn.preprocessing import StandardScaler
 terrain = terrain_data("Kamloops.tif")
 n = 50
 terrain = terrain[:n,:n]      #this is the z
 n = len(terrain)
 print(terrain.shape)
 x = np.linspace(0,1,len(terrain))
-y = np.linspace(0,1,len(terrain[0]))
+y = np.linspace(0,1,len(terrain))
 x,y = np.meshgrid(x,y)
-degree = 30
+degree = 20
 deg  = np.linspace(1,degree,degree)
 terrain = np.ravel(terrain)
+#scaler = StandardScaler()
+#scaler.fit(terrain)
+#terrain_scaled = scaler.transform(terrain)
 terrain_scaled = (terrain-np.min(terrain))/(np.max(terrain)-np.min(terrain))
 
 
@@ -30,17 +34,25 @@ _,MSE_OLS,_,_,x_test,y_test,ztilde = OLS(x,y,np.reshape(terrain_scaled,(n,n)),de
 print("OLS")
 print("n = {:} degree = {:}".format(n,deg[np.argmin(MSE_OLS)]))
 print("MSE = {:.4}".format(np.min(MSE_OLS)))
+print(ztilde)
 contour_plot(x_test,y_test,ztilde)
 
+
+fig = plt.figure()
+ax = fig.gca(projection="3d")
+
+surf = ax.plot_surface(x, y, ztilde, cmap=cm.coolwarm,linewidth=0, antialiased=False)
+fig.colorbar(surf, shrink=0.5, aspect=5)
+plt.show()
+
+"""
 plt.title("Mean squared error with OLS on terrain data")
 plt.xlabel("Complexity")
 plt.ylabel("MSE")
 plt.plot(deg,MSE_OLS,label="OLS")
 plt.legend()
 plt.show()
-
-
-
+"""
 """
 #Then we're doing OLS with bootstrap
 B = 10
@@ -109,7 +121,7 @@ plt.show()
 """
 
 #Lasso with cross validation and bootstrap
-
+"""
 lambda_ = np.logspace(-4,0,5)
 B = 100
 k = 5
@@ -138,3 +150,4 @@ heatmap.set_ylabel("$\lambda$")
 heatmap.invert_yaxis()
 heatmap.set_title("Heatmap made from {:} folds in cross validation".format(k))
 plt.show()
+"""

@@ -107,8 +107,10 @@ if __name__ == '__main__':
     plt.plot(deg,R2_score,label="manual k fold R2 score")
     plt.legend()
     plt.show()
-    """
+
     #Comparing with Bootstrap
+    """
+
     B = 100
     _,MSE_boot,_,_,_ = bootstrap(B,x,y,z,"ols",0,degree)
 

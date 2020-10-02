@@ -13,8 +13,7 @@ def OLS(x,y,z,degree,noise,z_star):
     X = X_D(x,y,5)
     beta = beta_(X,np.ravel(z))
                      #We'll use this for the confidence interval of 95 percent
-    var_beta = var(X,noise)
-    std_beta = np.sqrt(var_beta)*z_star
+
 
 
 
@@ -75,13 +74,14 @@ def OLS(x,y,z,degree,noise,z_star):
         X_train = X_D(x_train,y_train,i)               #X will have the same values on the columns
         X_test = X_D(x_test,y_test,i)
         scaler.fit(X_train)
-
         X_train_scaled = scaler.transform(X_train)
         X_test_scaled = scaler.transform(X_test)
         X_train_scaled[:,0] = 1                   #setting the first column = 1 because standard scaler sets it to 0
         X_test_scaled[:,0] = 1
 
         beta_scaled =  beta_(X_train_scaled,z_train)
+        var_beta = var(X_train_scaled,noise)
+        std_beta = np.sqrt(var_beta)*z_star
         z_tilde_scaled_train = X_train_scaled.dot(beta_scaled)
         z_tilde_scaled_test = X_test_scaled.dot(beta_scaled)
 
@@ -93,26 +93,29 @@ def OLS(x,y,z,degree,noise,z_star):
             ztilde_best = np.reshape(z_tilde_scaled_test,(x_test.shape[0],x_test.shape[1]))
             MSE_minimum = MSE_test[i-1]
 
-    return MSE_train,MSE_test,beta,std_beta,x_test,y_test,ztilde_best
+    return MSE_train,MSE_test,beta_scaled,std_beta,x_test,y_test,ztilde_best
 
 if __name__ == '__main__':
-    np.random.seed(102)
-    n = 15
+
+    np.random.seed(11)
+    n = 8
     z_star = 1.96 #We want 95% confidence inerval
     x = np.random.uniform(0,1,n)
     y = np.random.uniform(0,1,n)
     x = np.sort(x)
     y = np.sort(y)
     x,y = np.meshgrid(x,y)
-    noise = 0.01
+    noise = 0.001
     noise_arr = noise*np.random.randn(n,n)
     z =FrankeFunction(x,y)+noise
-    degree = 20
+    degree = 5
     deg = np.linspace(0,degree,degree)
     MSE_train,MSE_test,beta,std_beta,_,_,_ = OLS(x,y,z,degree,noise,z_star)
-
+    plt.style.use("seaborn")
     plt.plot(deg,MSE_train,label="Train")
     plt.plot(deg,MSE_test,label="Test")
+    
+    plt.yscale("log")
     plt.legend()
     plt.show()
 
