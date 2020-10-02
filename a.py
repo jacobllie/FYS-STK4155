@@ -98,7 +98,7 @@ def OLS(x,y,z,degree,noise,z_star):
 if __name__ == '__main__':
 
     np.random.seed(11)
-    n = 8
+    n = 50
     z_star = 1.96 #We want 95% confidence inerval
     x = np.random.uniform(0,1,n)
     y = np.random.uniform(0,1,n)
@@ -111,15 +111,23 @@ if __name__ == '__main__':
     degree = 5
     deg = np.linspace(0,degree,degree)
     MSE_train,MSE_test,beta,std_beta,_,_,_ = OLS(x,y,z,degree,noise,z_star)
+    print(std_beta)
+    plt.figure()
     plt.style.use("seaborn")
+    plt.title("MSE for train and test with n = {:d}".format(n))
     plt.plot(deg,MSE_train,label="Train")
     plt.plot(deg,MSE_test,label="Test")
-
-    plt.yscale("log")
+    plt.xlabel("Complexity")
+    plt.ylabel("MSE")
     plt.legend()
+    plt.savefig("./figures/a_test_train.jpg",bbox_inches = 'tight',pad_inches = 0.1)
     plt.show()
 
+
     x_axis = np.linspace(0,len(beta),len(beta))
-    plt.title("Beta coefficients with their confidence intervals")
+    plt.figure()
+    plt.title("Beta coefficients with their confidence intervals calculated for n = {:d}".format(n))
+    plt.xlabel(r"$\beta$ ")
     plt.errorbar(x_axis,beta,std_beta,fmt="o")
+    plt.savefig("./figures/a_beta.jpg",bbox_inches = 'tight',pad_inches = 0.1)
     plt.show()

@@ -75,23 +75,45 @@ def bootstrap(B,x,y,z,model,lambda_,degree):
     return train_error,test_error,test_bias,test_variance,min_test_error
 
 if __name__ == '__main__':
-    n = 25
+    n = 50
     print(n)
     np.random.seed(130)
     x = np.random.uniform(0,1,n)
     y = np.random.uniform(0,1,n)
-    noise = 0. * np.random.randn(n,n)
+    noise = 0.1 * np.random.randn(n,n)
     x = np.sort(x)
     y = np.sort(y)
     x,y = np.meshgrid(x,y)
     z = np.ravel(FrankeFunction(x,y)+noise)
     degree = 20
+    deg = np.linspace(1,degree,degree)
     MSE = np.zeros(degree)
     R2_score = np.zeros(degree)
 
 
     #Its important to send the meshgrid into the design matrix function
 
-    B = 100
+    B = 75
 
-    bootstrap(B,x,y,z,"ols",0,degree)
+    train_error,test_error,bias,variance,min_test_error = bootstrap(B,x,y,z,"ols",0,degree)
+
+
+    plt.style.use("seaborn")
+    plt.title("MSE for {:d} bootstraps n = {:d}".format(B,n))
+    plt.xlabel("Complexity")
+    plt.ylabel("MSE")
+    plt.plot(deg,train_error,label="Train")
+    plt.plot(deg,test_error,label="Test")
+    plt.legend()
+    plt.savefig("./figures/b_train_test.jpg",bbox_inches = 'tight',pad_inches = 0.1)
+    plt.show()
+
+    plt.title("Bias variance plot for B = {:d} n = {:d}".format(B,n))
+    plt.xlabel("Complexity")
+    plt.ylabel("error")
+    plt.plot(deg,test_error,label="MSE")
+    plt.plot(deg,bias,label="bias")
+    plt.plot(deg,variance,label="variance")
+    plt.legend()
+    plt.savefig("./figures/b_bias_variance.jpg",bbox_inches = 'tight',pad_inches = 0.1)
+    plt.show()

@@ -20,38 +20,30 @@ x,y = np.meshgrid(x,y)
 degree = 20
 deg  = np.linspace(1,degree,degree)
 terrain = np.ravel(terrain)
-#scaler = StandardScaler()
-#scaler.fit(terrain)
-#terrain_scaled = scaler.transform(terrain)
 terrain_scaled = (terrain-np.min(terrain))/(np.max(terrain)-np.min(terrain))
 
+
+file = open("g_result.txt","w")
 
 
 #First we're doing the OLS
 
 contour_plot(x,y,np.reshape(terrain_scaled,(n,n)))
-_,MSE_OLS,_,_,x_test,y_test,ztilde,i_best,beta_best = OLS(x,y,np.reshape(terrain_scaled,(n,n)),degree,0,0)
-print("OLS")
-print("n = {:} degree = {:}".format(n,deg[np.argmin(MSE_OLS)]))
-print("MSE = {:.4}".format(np.min(MSE_OLS)))
-print(ztilde.shape)
-"""contour_plot(x_test,y_test,ztilde)
+
+_,MSE_OLS,_,_,ztilde,i_best,beta_best = OLS(x,y,np.reshape(terrain_scaled,(n,n)),degree,0,0)
+file.write("OLS\n")
+file.write("n = {:} degree = {:}\n".format(n,deg[np.argmin(MSE_OLS)]))
+file.write("MSE = {:.4}\n".format(np.min(MSE_OLS)))
 
 
-fig = plt.figure()
-ax = fig.gca(projection="3d")
-
-surf = ax.plot_surface(x_test, y_test, ztilde, cmap=cm.coolwarm,linewidth=0, antialiased=False)
-fig.colorbar(surf, shrink=0.5, aspect=5)
-plt.show()"""
 
 
 
 terrain = np.reshape(terrain_scaled,(n,n))
+
 x = np.linspace(0, 1, 100)
 y = np.linspace(0, 1, 100)
 X,Y = np.meshgrid(x,y)
-print(beta_best.shape)
 z_data = X_D(X,Y,i_best).dot(beta_best).reshape(100,100)
 
 plt.subplot(1,2,1)
@@ -59,27 +51,30 @@ plt.imshow(np.reshape(terrain_scaled,(n,n)), cmap="gist_earth")
 plt.subplot(1,2,2)
 plt.imshow(z_data, cmap="gist_earth")
 plt.show()
-
 contour_plot(X,Y,z_data)
 
 
-"""
+
 plt.title("Mean squared error with OLS on terrain data")
 plt.xlabel("Complexity")
 plt.ylabel("MSE")
 plt.plot(deg,MSE_OLS,label="OLS")
 plt.legend()
 plt.show()
-"""
-"""
+
+
+
+
 #Then we're doing OLS with bootstrap
-B = 10
+B = 75
 method = "ols"
-degree = 30
-_,MSE_boot,_,_,_ = bootstrap(B,x,y,np.reshape(terrain_scaled,(n,n)),method,0,degree)
-print("OLS with bootstrap")
-print("n = {:} degree = {:} bootstraps = {:}".format(n,deg[np.argmin(MSE_boot)],B))
-print("MSE = {:.4}".format(np.min(MSE_boot)))
+_,MSE_boot,_,_,_ = bootstrap(B,x,y,terrain_scaled,method,0,degree)
+
+file.write("OLS with bootstrap\n")
+file.write("n = {:} degree = {:} bootstraps = {:}\n".format(n,deg[np.argmin(MSE_boot)],B))
+file.write("MSE = {:.4}\n".format(np.min(MSE_boot)))
+
+"""
 plt.title("Mean squared error with bootstrap & OLS on terrain data")
 plt.xlabel("Complexity")
 plt.ylabel("MSE")
@@ -91,11 +86,15 @@ plt.show()
 """
 #Then we're doing OLS with k fold cross validation
 k = 5
-degree = 30
 MSE_cross,_,_,_ = cross_validation(k,x,y,terrain_scaled,degree,"ols",0)
-print("OLS with k fold cross validation")
-print("n = {:} degree = {:} k = {:}".format(n,deg[np.argmin(MSE_cross)],k))
-print("MSE = {:.4}".format(np.min(MSE_cross)))
+
+file.write("OLS with k fold cross validation\n")
+file.write("n = {:} degree = {:} k = {:}\n".format(n,deg[np.argmin(MSE_cross)],k))
+file.write("MSE = {:.4}\n".format(np.min(MSE_cross)))
+"""
+
+
+"""
 plt.plot(deg,MSE_cross,label="Cross OLS")
 plt.xlabel("Complexity")
 plt.ylabel("MSE")
@@ -106,23 +105,27 @@ plt.show()
 #Then we're doing Ridge with bootstrap and cross validation
 
 
-"""
-k = 5
-B = 10
-degree =20
+
+
+
 method = "ridge"
-lambda_ = np.logspace(-4,1,5)
+lambda_ = np.logspace(-4,0,5)
 min_error_boot,min_error_cross,degree_index_boot,degree_index_cross,ridge_heatmap_boot,ridge_heatmap_cross = ridge(x,y,terrain_scaled,k,B,lambda_,degree)
-print("----------Bootstrap----------")
-print("The best error with %.2f bootstraps and lambda %.5f and degree = %.2f"%(B,lambda_[np.argmin(min_error_boot)],degree_index_boot[np.argmin(min_error_boot)]))
-print(np.min(min_error_boot))
-print("----------Cross validation---------")
-print("The best error with %.2f folds and lambda %.5f and degree = %.2f"%(k,lambda_[np.argmin(min_error_cross)],degree_index_cross[np.argmin(min_error_cross)]))
-print(np.min(min_error_cross))
+
+
+file.write("Ridge with Bootstrap\n")
+file.write("The best error with %.2f bootstraps and lambda %.5f and degree = %.2f\n"%(B,lambda_[np.argmin(min_error_boot)],degree_index_boot[np.argmin(min_error_boot)]))
+file.write("MSE = {:.4}".format(np.min(min_error_boot)))
+file.write("\n")
+file.write("Ridge with Cross Validation\n")
+file.write("The best error with %.2f folds and lambda %.5f and degree = %.2f\n"%(k,lambda_[np.argmin(min_error_cross)],degree_index_cross[np.argmin(min_error_cross)]))
+file.write("MSE = {:.4}".format(np.min(min_error_cross)))
+file.write("\n")
 diff = np.min(min_error_boot)/np.min(min_error_cross)
-print("Cross validation was {:.3} better".format(diff))
+file.write("min min_error_boot/min_error_cross = {:.4}\n".format(diff))
 
 
+"""
 heatmap = sb.heatmap(ridge_heatmap_boot,annot=True,cmap="viridis_r",yticklabels=lambda_,cbar_kws={'label': 'Mean squared error'})
 heatmap.set_xlabel("Complexity")
 heatmap.set_ylabel("$\lambda$")
@@ -139,22 +142,23 @@ plt.show()
 """
 
 #Lasso with cross validation and bootstrap
-"""
+
 lambda_ = np.logspace(-4,0,5)
-B = 100
-k = 5
+
 min_error_boot,min_error_cross,lasso_heatmap_boot,lasso_heatmap_cross,degree_index_boot,degree_index_cross = lasso(lambda_,degree,x,y,terrain_scaled,k,B)
-print("---------Lasso---------")
-print("----------Bootstrap----------")
-print("The best error with %.2f bootstraps and lambda %.5f and degree = %.2f"%(B,lambda_[np.argmin(min_error_boot)],degree_index_boot[np.argmin(min_error_boot)]))
-print(np.min(min_error_boot))
-print("----------Cross validation---------")
-print("The best error with %.2f folds and lambda %.5f and degree = %.2f"%(k,lambda_[np.argmin(min_error_cross)],degree_index_cross[np.argmin(min_error_cross)]))
-print(np.min(min_error_cross))
+file.write("Lasso with Bootstrap\n")
+file.write("The best error with %.2f bootstraps and lambda %.5f and degree = %.2f\n"%(B,lambda_[np.argmin(min_error_boot)],degree_index_boot[np.argmin(min_error_boot)]))
+file.write("MSE = {:.4}\n".format(np.min(min_error_boot)))
+file.write("Lasso with Cross Validation\n")
+file.write("The best error with %.2f folds and lambda %.5f and degree = %.2f\n"%(k,lambda_[np.argmin(min_error_cross)],degree_index_cross[np.argmin(min_error_cross)]))
+file.write("MSE = {:.4}\n".format(np.min(min_error_cross)))
 diff = np.min(min_error_boot)/np.min(min_error_cross)
-print("Cross validation was {:.3} better".format(diff))
+file.write("min_error_boot/min_error_cross = {:.4}".format(diff))
 
 
+file.close()
+
+"""
 heatmap = sb.heatmap(lasso_heatmap_boot,annot=True,cmap="viridis_r",yticklabels=lambda_,cbar_kws={'label': 'Mean squared error'})
 heatmap.set_xlabel("Complexity")
 heatmap.set_ylabel("$\lambda$")

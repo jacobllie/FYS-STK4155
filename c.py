@@ -72,18 +72,18 @@ def cross_validation(k,x,y,z,degree,model,lambda_):
 
 
 if __name__ == '__main__':
-#np.random.seed(101)
+    np.random.seed(130)
     n = 50
     x = np.random.uniform(0,1,n)
     y = np.random.uniform(0,1,n)
     x = np.sort(x)
     y = np.sort(y)
     n = len(x)
-    degree = 15
+    degree = 23
     deg = np.linspace(1,degree,degree)
     R2_score = np.zeros(degree)
 
-    noise = 0.2*np.random.randn(n,n)
+    noise = 0.1*np.random.randn(n,n)
     #Its important to send the meshgrid into the design matrix function
     x,y = np.meshgrid(x,y)
     z =np.ravel((FrankeFunction(x,y)+noise))
@@ -92,30 +92,33 @@ if __name__ == '__main__':
 
     MSE_fold,R2_score,score,min_error = cross_validation(k,x,y,z,degree,"ols",0)
 
+    plt.style.use("seaborn")
     """
+    plt.title("Cross validation with {:d} folds".format(k))
     plt.plot(deg,(MSE_fold),label="MSE")
     plt.xlabel("Complexity")
     plt.ylabel("Error")
     plt.legend()
     plt.show()
+    """
 
 
-
-
+    """
     plt.plot(deg,R2_score,label="manual k fold R2 score")
     plt.legend()
     plt.show()
-
-    #Comparing with Bootstrap
     """
+    #Comparing with Bootstrap
 
-    B = 100
+
+    B = 75
     _,MSE_boot,_,_,_ = bootstrap(B,x,y,z,"ols",0,degree)
 
-    plt.title("Bootstrap vs Cross validation {:} folds {:} bootstraps ".format(k,B))
+    plt.title("Bootstrap vs Cross validation {:} folds {:} bootstraps n = {:d}".format(k,B,n))
     plt.plot(deg,MSE_fold,label="Cross validation")
     plt.plot(deg,MSE_boot,label="Bootstrap")
     plt.xlabel("Complexity")
     plt.ylabel("MSE")
     plt.legend()
+    plt.savefig("./figures/c_boot_vs_cross.jpg",bbox_inches = 'tight',pad_inches = 0.1)
     plt.show()

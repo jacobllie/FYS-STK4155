@@ -32,9 +32,12 @@ def lasso(lambda_,degree,x,y,z,k,B):
         #plt.plot(deg,variance,label="variance")
         i+=1
     #sb.color_palette("viridis_r", as_cmap=True)
-        """plt.plot(deg,MSE_lasso_boot,label="boot")
+        """
+        plt.title("Bootstrap vs Cross for B = {:d} k = {:d} $\lambda$ = {:.4} n = {:d}".format(B,k,lambdas,n))
+        plt.plot(deg,MSE_lasso_boot,label="boot")
         plt.plot(deg,MSE_lasso_cross,label="cross")
         plt.legend()
+        plt.savefig("./figures/lasso_boot_vs_cross{:d}.pdf".format(i),bbox_inches = 'tight',pad_inches = 0.1,dpi=1200)
         plt.show()"""
     """
     heatmap = sb.heatmap(lasso_heatmap_boot,annot=True,cmap="viridis_r",yticklabels=lambda_,cbar_kws={'label': 'Mean squared error'})
@@ -62,7 +65,7 @@ if __name__ == '__main__':
     degree = 20
     lambda_ = np.array([1e-4,1e-3,1e-2,1e-1,1])
     np.random.seed(130)
-    n = 15
+    n = 50
     x = np.random.uniform(0,1,n)
     y = np.random.uniform(0,1,n)
     noise = 0.1 * np.random.randn(n,n)
@@ -70,7 +73,7 @@ if __name__ == '__main__':
     y = np.sort(y)
     x,y = np.meshgrid(x,y)
     z = np.ravel(FrankeFunction(x,y)+noise)
-    B = 100
+    B = 75
     bias = np.zeros(degree)
     variance = np.zeros(degree)
     k = 5
@@ -86,16 +89,20 @@ if __name__ == '__main__':
     print("Cross validation was {:.3} better".format(diff))
 
 
-    heatmap = sb.heatmap(lasso_heatmap_boot,annot=True,cmap="viridis_r",yticklabels=lambda_,cbar_kws={'label': 'Mean squared error'})
-    heatmap.set_xlabel("Complexity")
-    heatmap.set_ylabel("$\lambda$")
+    heatmap = sb.heatmap(lasso_heatmap_boot.T,annot=True,cmap="viridis_r",xticklabels=lambda_,cbar_kws={'label': 'Mean squared error'},fmt = ".5")
+    heatmap.set_xlabel("$\lambda$")
+    heatmap.set_ylabel("Complexity")
     heatmap.invert_yaxis()
     heatmap.set_title("Heatmap made from {:} bootstraps".format(B))
+    fig = heatmap.get_figure()
+    fig.savefig("./figures/lasso_heatmap_boot.pdf",bbox_inches = 'tight',pad_inches = 0.1,dpi=1200)
     plt.show()
 
-    heatmap = sb.heatmap(lasso_heatmap_cross,annot=True,cmap="viridis_r",yticklabels=lambda_,cbar_kws={'label': 'Mean squared error'})
-    heatmap.set_xlabel("Complexity")
-    heatmap.set_ylabel("$\lambda$")
+    heatmap = sb.heatmap(lasso_heatmap_cross.T,annot=True,cmap="viridis_r",xticklabels=lambda_,cbar_kws={'label': 'Mean squared error'},fmt=".5")
+    heatmap.set_xlabel("$\lambda$")
+    heatmap.set_ylabel("Complexity")
     heatmap.invert_yaxis()
     heatmap.set_title("Heatmap made from {:} folds in cross validation".format(k))
+    fig = heatmap.get_figure()
+    fig.savefig("./figures/lasso_heatmap_cross.pdf",bbox_inches = 'tight',pad_inches = 0.1,dpi=1200)
     plt.show()
