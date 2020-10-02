@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from functions import FrankeFunction,beta_,mean_squared_error,beta_r,R2,terrain_data,contour_plot
+from functions import FrankeFunction,beta_,mean_squared_error,beta_r,R2,terrain_data,contour_plot,X_D
 from a import OLS
 from b import bootstrap
 from c import cross_validation

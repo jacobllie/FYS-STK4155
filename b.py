@@ -2,15 +2,13 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from X_D import X_D
-from FrankeFunction import FrankeFunction
 from sklearn.utils import resample
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 import numpy as np
 import matplotlib.pyplot as plt
 import sklearn.linear_model as skl
-from functions import R2,mean_squared_error,beta_,beta_r
+from functions import R2,mean_squared_error,beta_,beta_r,X_D,FrankeFunction
 
 def bootstrap(B,x,y,z,model,lambda_,degree):
     train_bias = np.zeros(degree)

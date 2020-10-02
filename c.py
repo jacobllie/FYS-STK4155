@@ -2,8 +2,6 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from X_D import X_D
-from FrankeFunction import FrankeFunction
 from sklearn.utils import resample
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split,cross_val_score
@@ -12,7 +10,7 @@ import matplotlib.pyplot as plt
 import sys
 import sklearn.linear_model as skl
 from sklearn.metrics import mean_squared_error,r2_score
-from functions import beta_, R2, mean_squared_error,beta_r
+from functions import beta_, R2, mean_squared_error,beta_r,X_D,FrankeFunction
 from b import bootstrap
 
 def cross_validation(k,x,y,z,degree,model,lambda_):

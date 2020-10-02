@@ -2,9 +2,8 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from X_D import X_D
 from sklearn.utils import resample
-from functions import beta_,mean_squared_error,R2,FrankeFunction,var
+from functions import beta_,mean_squared_error,R2,FrankeFunction,var,X_D
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -114,7 +113,7 @@ if __name__ == '__main__':
     plt.style.use("seaborn")
     plt.plot(deg,MSE_train,label="Train")
     plt.plot(deg,MSE_test,label="Test")
-    
+
     plt.yscale("log")
     plt.legend()
     plt.show()
