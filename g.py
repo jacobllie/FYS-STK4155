@@ -41,7 +41,7 @@ contour_plot(x_test,y_test,ztilde)
 fig = plt.figure()
 ax = fig.gca(projection="3d")
 
-surf = ax.plot_surface(x, y, ztilde, cmap=cm.coolwarm,linewidth=0, antialiased=False)
+surf = ax.plot_surface(x_test, y_test, ztilde, cmap=cm.coolwarm,linewidth=0, antialiased=False)
 fig.colorbar(surf, shrink=0.5, aspect=5)
 plt.show()
 

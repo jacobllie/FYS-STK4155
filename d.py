@@ -1,5 +1,4 @@
-from X_D import X_D
-from FrankeFunction import FrankeFunction
+
 from sklearn.utils import resample
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, cross_val_score
@@ -7,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sklearn.linear_model as skl
 from sklearn.metrics import mean_squared_error,r2_score
-from functions import beta_,R2,mean_squared_error,beta_r
+from functions import beta_,R2,mean_squared_error,beta_r,FrankeFunction
 from c import cross_validation
 from b import bootstrap
 import seaborn as sb
@@ -74,7 +73,7 @@ if __name__ == '__main__':
     MSE_ridge_cross = np.zeros(degree)
     lambda_ = np.array([1e-4,1e-3,1e-2,1e-1,1])
 
-    
+
     k = 5
     B = 10
 
