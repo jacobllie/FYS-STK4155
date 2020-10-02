@@ -93,7 +93,7 @@ def OLS(x,y,z,degree,noise,z_star):
             MSE_minimum = MSE_test[i-1]
             i_best = i
 
-    return MSE_train,MSE_test,beta_best,std_beta,x_test,y_test,ztilde_best,i_best
+    return MSE_train,MSE_test,beta_scaled,std_beta,ztilde_best,i_best,beta_best
 
 if __name__ == '__main__':
 

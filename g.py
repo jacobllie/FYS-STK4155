@@ -9,7 +9,7 @@ from e import lasso
 import seaborn as sb
 from matplotlib.pyplot import cm
 from sklearn.preprocessing import StandardScaler
-terrain = terrain_data("Calgary.tif")
+terrain = terrain_data("Kamloops.tif")
 n = 50
 terrain = terrain[:n,:n]      #this is the z
 n = len(terrain)
@@ -29,8 +29,8 @@ terrain_scaled = (terrain-np.min(terrain))/(np.max(terrain)-np.min(terrain))
 
 #First we're doing the OLS
 
-#contour_plot(x,y,np.reshape(terrain_scaled,(n,n)))
-_,MSE_OLS,beta_best,_,x_test,y_test,ztilde,i_best = OLS(x,y,np.reshape(terrain_scaled,(n,n)),degree,0,0)
+contour_plot(x,y,np.reshape(terrain_scaled,(n,n)))
+_,MSE_OLS,_,_,x_test,y_test,ztilde,i_best,beta_best = OLS(x,y,np.reshape(terrain_scaled,(n,n)),degree,0,0)
 print("OLS")
 print("n = {:} degree = {:}".format(n,deg[np.argmin(MSE_OLS)]))
 print("MSE = {:.4}".format(np.min(MSE_OLS)))
@@ -59,6 +59,8 @@ plt.imshow(np.reshape(terrain_scaled,(n,n)), cmap="gist_earth")
 plt.subplot(1,2,2)
 plt.imshow(z_data, cmap="gist_earth")
 plt.show()
+
+contour_plot(X,Y,z_data)
 
 
 """
