@@ -57,22 +57,19 @@ def bootstrap(B,x,y,z,model,lambda_,degree):
             train_error[i-1] = np.mean(np.mean((z_train - z_pred_train)**2, axis=1, keepdims=True) )
             test_error[i-1] = np.mean(np.mean((z_test - z_pred_test)**2, axis=1, keepdims=True) )
             min_test_error = np.min(test_error)
-            train_bias[i-1] = np.mean( (z_train - np.mean(z_pred_train, axis=1, keepdims=True))**2 )
             test_bias[i-1] = np.mean( (z_test - np.mean(z_pred_test, axis=1, keepdims=True))**2 )
-            train_variance[i-1] = np.mean( np.var(z_pred_train, axis=1, keepdims=True) )
+
             test_variance[i-1] = np.mean( np.var(z_pred_test, axis=1, keepdims=True) )
 
 
     #Bootstrap bias- variance trade off
-    print(z_pred_test.shape)
-    print(np.mean(z_pred_test, axis=1, keepdims=True).shape)
-    print(np.mean(z_pred_test, axis=1).shape)
+
     """
     plt.title("Mean squared error")
     plt.plot(deg,train_error,label="Train")
     plt.plot(deg,test_error,label="Test")
-    plt.plot(deg,test_variance,label="variance")
-    plt.plot(deg,test_bias,label="bias")
+    #plt.plot(deg,test_variance,label="variance")
+    #plt.plot(deg,test_bias,label="bias")
     plt.legend()
     plt.show()
     """
@@ -80,23 +77,23 @@ def bootstrap(B,x,y,z,model,lambda_,degree):
     return train_error,test_error,test_bias,test_variance,min_test_error
 
 if __name__ == '__main__':
-    n = 20
+    n = 25
     print(n)
     np.random.seed(130)
     x = np.random.uniform(0,1,n)
     y = np.random.uniform(0,1,n)
-    noise = 0.1 * np.random.randn(n,n)
+    noise = 0. * np.random.randn(n,n)
     x = np.sort(x)
     y = np.sort(y)
     x,y = np.meshgrid(x,y)
     z = np.ravel(FrankeFunction(x,y)+noise)
-    degree = 15
+    degree = 20
     MSE = np.zeros(degree)
     R2_score = np.zeros(degree)
 
 
     #Its important to send the meshgrid into the design matrix function
 
-    B = 10
+    B = 100
 
     bootstrap(B,x,y,z,"ols",0,degree)
