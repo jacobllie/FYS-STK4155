@@ -64,11 +64,14 @@ def cross_validation(k,x,y,z,degree,model,lambda_):
 
             R2_score[i-1] += R2(z_test_fold,z_tilde_fold,np.mean(z_test_fold))
             MSE_fold[i-1] += mean_squared_error(z_test_fold,z_tilde_fold)
-            if MSE_fold[i-1] < MSE_minimum:
+            if MSE_fold[i-1] < MSE_minimum and model != "lasso":
                 ztilde_best = z_tilde_fold
                 beta_best = beta_fold
-                MSE_minimum = MSE_fold[i-1]
                 i_best = i
+            else:
+                beta_best="lasso"
+                i_best="lasso"
+                ztilde_best="lasso"
 
         MSE_fold[i-1]/=k
         R2_score[i-1]/=k

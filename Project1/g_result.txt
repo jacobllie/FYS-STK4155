@@ -1,3 +1,23 @@
 OLS
-n = 50 degree = 15.0
-MSE = 0.0002822
+n = 50 degree = 20.0
+MSE = 0.0001796
+OLS with bootstrap
+n = 50 degree = 14.0 bootstraps = 75
+MSE = 0.0002248
+OLS with k fold cross validation
+n = 50 degree = 20.0 k = 5
+MSE = 0.0001993
+Ridge with Bootstrap
+The best error with 75.00 bootstraps and lambda 0.00010 and degree = 18.00
+MSE = 0.0003082
+Ridge with Cross Validation
+The best error with 5.00 folds and lambda 0.00010 and degree = 20.00
+MSE = 0.0003026
+min min_error_boot/min_error_cross = 1.019
+Lasso with Bootstrap
+The best error with 75.00 bootstraps and lambda 0.00010 and degree = 20.00
+MSE = 0.0008168
+Lasso with Cross Validation
+The best error with 5.00 folds and lambda 0.00010 and degree = 20.00
+MSE = 0.0008213
+min_error_boot/min_error_cross = 0.9945

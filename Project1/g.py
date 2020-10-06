@@ -34,8 +34,12 @@ file.write("n = {:} degree = {:}\n".format(n,deg[np.argmin(MSE_OLS)]))
 file.write("MSE = {:.4}\n".format(np.min(MSE_OLS)))
 
 k=5
-_,_,_,_, beta_best, i_best, _ = cross_validation(k,x,y,terrain_scaled,degree,"ols",0)
 
+"""method="ridge"
+MSE_fold,R2_score,score,min_error, beta_best, i_best, _ = cross_validation(k,x,y,terrain_scaled,degree,method,0)
+
+
+print(min_error, R2_score[i_best-1], i_best)
 
 terrain = np.reshape(terrain_scaled,(n,n))
 
@@ -45,12 +49,14 @@ X,Y = np.meshgrid(x_mrk,y_mrk)
 z_data = X_D(X,Y,i_best).dot(beta_best).reshape(100,100)
 
 plt.subplot(1,2,1)
+plt.axis('off')
 plt.title("Terrain data")
 plt.imshow(np.reshape(terrain_scaled,(n,n)), cmap="gist_earth")
 plt.subplot(1,2,2)
+plt.axis('off')
 plt.title("Model")
 plt.imshow(z_data, cmap="gist_earth")
-plt.savefig("figures/terrain_image.pdf")
+plt.savefig("figures/terrain_image"+method+".png",dpi=1200,bbox_inches = 'tight',pad_inches = 0.1)
 plt.show()
 
 plt.subplot(1,2,1)
@@ -60,7 +66,7 @@ plt.subplot(1,2,2)
 plt.title("Model")
 cp = plt.contour(X,Y,z_data)
 plt.colorbar(cp) # Add a colorbar to a plot
-plt.savefig("figures/terrain_contour.pdf")
+plt.savefig("figures/terrain_contour"+method+".png",dpi=1200,bbox_inches = 'tight',pad_inches = 0.1)
 plt.show()
 
 
@@ -70,7 +76,7 @@ plt.xlabel("Complexity")
 plt.ylabel("MSE")
 plt.plot(deg,MSE_OLS,label="OLS")
 plt.legend()
-plt.show()
+plt.show()"""
 
 
 
@@ -93,14 +99,13 @@ plt.legend()
 plt.show()
 """
 
-"""
+
 #Then we're doing OLS with k fold cross validation
-MSE_cross,_,_,_ = cross_validation(k,x,y,terrain_scaled,degree,"ols",0)
+MSE_cross,_,_,_,_,_,_ = cross_validation(k,x,y,terrain_scaled,degree,"ols",0)
 
 file.write("OLS with k fold cross validation\n")
 file.write("n = {:} degree = {:} k = {:}\n".format(n,deg[np.argmin(MSE_cross)],k))
 file.write("MSE = {:.4}\n".format(np.min(MSE_cross)))
-"""
 
 
 """

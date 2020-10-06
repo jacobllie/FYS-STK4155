@@ -92,7 +92,7 @@ def OLS(x,y,z,degree,noise,z_star):
             beta_best = beta_scaled
             MSE_minimum = MSE_test[i-1]
             i_best = i
-        print("R2_score %.3f %d" %(R2_score[i-1],i))
+        #print("R2_score %.3f %d" %(R2_score[i-1],i))
     return MSE_train,MSE_test,beta_scaled,std_beta,ztilde_best,i_best,beta_best
 
 if __name__ == '__main__':

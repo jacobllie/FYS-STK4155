@@ -24,7 +24,7 @@ def lasso(lambda_,degree,x,y,z,k,B):
         _,MSE_lasso_boot,bias,variance,min_error_boot[i] = bootstrap(B,x,y,z,"lasso",lambdas,degree)
         lasso_heatmap_boot[i] = MSE_lasso_boot
         degree_index_boot[i] = deg[np.argmin(MSE_lasso_boot)]
-        MSE_lasso_cross,_,_,min_error_cross[i];_,_,_ = cross_validation(k,x,y,z,degree,"lasso",lambdas)
+        MSE_lasso_cross,_,_,min_error_cross[i],_,_,_ = cross_validation(k,x,y,z,degree,"lasso",lambdas)
         lasso_heatmap_cross[i] = MSE_lasso_cross
         degree_index_cross[i] = deg[np.argmin(MSE_lasso_boot)]
         #plt.plot(deg,MSE_lasso_boot,label="error")
