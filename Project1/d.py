@@ -31,7 +31,7 @@ def ridge(x,y,z,k,B,lambda_,degree):
         _,MSE_ridge_boot,bias_boot,variance_boot,min_error_boot[i] = bootstrap(B,x,y,z,"ridge",lambdas,degree)
         ridge_heatmap_boot[i] = MSE_ridge_boot
         degree_index_boot[i] = deg[np.argmin(MSE_ridge_boot)]    #the smallest MSE_ridge_boot value will give a degree, which we insert into the degree_index_boot array
-        MSE_ridge_cross,_,_,min_error_cross[i] = cross_validation(k,x,y,z,degree,"ridge",lambdas)
+        MSE_ridge_cross,_,_,min_error_cross[i],_,_,_ = cross_validation(k,x,y,z,degree,"ridge",lambdas)
         ridge_heatmap_cross[i] = MSE_ridge_cross
         degree_index_cross[i] = deg[np.argmin(MSE_ridge_cross)]
         """plt.title("Bootstrap vs Cross validation $\lambda$ = {:.4} k = {:d} B = {:d} n = {:d}".format(lambdas,k,B,n))
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     heatmap.invert_yaxis()
     heatmap.set_title("Heatmap made from {:} bootstraps".format(B))
     fig = heatmap.get_figure()
-    #fig.savefig("./figures/ridge_heatmap_boot.pdf",bbox_inches = 'tight',pad_inches = 0.1,dpi = 1200)
+    fig.savefig("./figures/ridge_heatmap_boot.pdf",bbox_inches = 'tight',pad_inches = 0.1,dpi = 1200)
     plt.show()
 
     heatmap = sb.heatmap(ridge_heatmap_cross.T,annot=True,cmap="viridis_r",xticklabels=lambda_,cbar_kws={'label': 'Mean squared error'},fmt=".5")
@@ -102,5 +102,5 @@ if __name__ == '__main__':
     heatmap.invert_yaxis()
     heatmap.set_title("Heatmap made from {:} folds in cross validation".format(k))
     fig = heatmap.get_figure()
-    #fig.savefig("./figures/ridge_heatmap_cross.pdf",bbox_inches = 'tight',pad_inches = 0.1,dpi=1200)
+    fig.savefig("./figures/ridge_heatmap_cross.pdf",bbox_inches = 'tight',pad_inches = 0.1,dpi=1200)
     plt.show()

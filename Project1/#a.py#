@@ -39,6 +39,9 @@ def OLS(x,y,z,degree,noise,z_star):
     ax = fig.gca(projection="3d")
 
     # Plot the surface.
+    ax = fig.gca(projection="3d")
+
+    # Plot the surface.
     surf = ax.plot_surface(x, y, z_tilde_plot, cmap=cm.coolwarm,linewidth=0, antialiased=False)
 
     # Customize the z axis.
@@ -92,7 +95,7 @@ def OLS(x,y,z,degree,noise,z_star):
             beta_best = beta_scaled
             MSE_minimum = MSE_test[i-1]
             i_best = i
-        print("R2_score %.3f %d" %(R2_score[i-1],i))
+
     return MSE_train,MSE_test,beta_scaled,std_beta,ztilde_best,i_best,beta_best
 
 if __name__ == '__main__':
@@ -120,7 +123,7 @@ if __name__ == '__main__':
     plt.xlabel("Complexity")
     plt.ylabel("MSE")
     plt.legend()
-    plt.savefig("./figures/a_test_train.jpg",bbox_inches = 'tight',pad_inches = 0.1,dpi=1200)
+    plt.savefig("./figures/a_test_train.jpg",bbox_inches = 'tight',pad_inches = 0.1)
     plt.show()
 
 
@@ -129,5 +132,5 @@ if __name__ == '__main__':
     plt.title("Beta coefficients with their confidence intervals calculated for n = {:d}".format(n))
     plt.xlabel(r"$\beta$ ")
     plt.errorbar(x_axis,beta,std_beta,fmt="o")
-    plt.savefig("./figures/a_beta.jpg",bbox_inches = 'tight',pad_inches = 0.1,dpi=1200)
+    plt.savefig("./figures/a_beta.jpg",bbox_inches = 'tight',pad_inches = 0.1)
     plt.show()

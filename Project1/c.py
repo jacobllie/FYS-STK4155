@@ -16,9 +16,10 @@ from b import bootstrap
 def cross_validation(k,x,y,z,degree,model,lambda_):
     MSE_fold = np.zeros(degree)
     R2_score = np.zeros(degree)
-    score = np.zeros(degree)
+    score = "Hello there"
     scaler = StandardScaler()
     deg = np.linspace(1,degree,degree)
+    MSE_minimum = 1e3
 
     for i in range(1,degree+1):
         print("Degree = %.3f"%i)
@@ -63,12 +64,17 @@ def cross_validation(k,x,y,z,degree,model,lambda_):
 
             R2_score[i-1] += R2(z_test_fold,z_tilde_fold,np.mean(z_test_fold))
             MSE_fold[i-1] += mean_squared_error(z_test_fold,z_tilde_fold)
+            if MSE_fold[i-1] < MSE_minimum:
+                ztilde_best = z_tilde_fold
+                beta_best = beta_fold
+                MSE_minimum = MSE_fold[i-1]
+                i_best = i
 
         MSE_fold[i-1]/=k
         R2_score[i-1]/=k
 
 
-    return MSE_fold,R2_score,score,np.min(MSE_fold)
+    return MSE_fold,R2_score,score,np.min(MSE_fold), beta_best, i_best, ztilde_best
 
 
 if __name__ == '__main__':
@@ -90,7 +96,7 @@ if __name__ == '__main__':
 
     k = 5        #how many models we'll make   we have int(n/k) values per model
 
-    MSE_fold,R2_score,score,min_error = cross_validation(k,x,y,z,degree,"ols",0)
+    MSE_fold,R2_score,score,min_error,_,_,_ = cross_validation(k,x,y,z,degree,"ols",0)
 
     plt.style.use("seaborn")
     """

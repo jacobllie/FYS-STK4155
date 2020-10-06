@@ -28,30 +28,40 @@ file = open("g_result.txt","w")
 
 #First we're doing the OLS
 
-contour_plot(x,y,np.reshape(terrain_scaled,(n,n)))
-
 _,MSE_OLS,_,_,ztilde,i_best,beta_best = OLS(x,y,np.reshape(terrain_scaled,(n,n)),degree,0,0)
 file.write("OLS\n")
 file.write("n = {:} degree = {:}\n".format(n,deg[np.argmin(MSE_OLS)]))
 file.write("MSE = {:.4}\n".format(np.min(MSE_OLS)))
 
-
-
+k=5
+_,_,_,_, beta_best, i_best, _ = cross_validation(k,x,y,terrain_scaled,degree,"ols",0)
 
 
 terrain = np.reshape(terrain_scaled,(n,n))
 
-x = np.linspace(0, 1, 100)
-y = np.linspace(0, 1, 100)
-X,Y = np.meshgrid(x,y)
+x_mrk = np.linspace(0, 1, 100)
+y_mrk = np.linspace(0, 1, 100)
+X,Y = np.meshgrid(x_mrk,y_mrk)
 z_data = X_D(X,Y,i_best).dot(beta_best).reshape(100,100)
 
 plt.subplot(1,2,1)
+plt.title("Terrain data")
 plt.imshow(np.reshape(terrain_scaled,(n,n)), cmap="gist_earth")
 plt.subplot(1,2,2)
+plt.title("Model")
 plt.imshow(z_data, cmap="gist_earth")
+plt.savefig("figures/terrain_image.pdf")
 plt.show()
-contour_plot(X,Y,z_data)
+
+plt.subplot(1,2,1)
+plt.title("Terrain data")
+plt.contour(x,y,np.reshape(terrain_scaled,(n,n)))
+plt.subplot(1,2,2)
+plt.title("Model")
+cp = plt.contour(X,Y,z_data)
+plt.colorbar(cp) # Add a colorbar to a plot
+plt.savefig("figures/terrain_contour.pdf")
+plt.show()
 
 
 
@@ -85,7 +95,6 @@ plt.show()
 
 """
 #Then we're doing OLS with k fold cross validation
-k = 5
 MSE_cross,_,_,_ = cross_validation(k,x,y,terrain_scaled,degree,"ols",0)
 
 file.write("OLS with k fold cross validation\n")
