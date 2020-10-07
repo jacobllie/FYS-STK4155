@@ -9,4 +9,4 @@ To benchmark the code, we find it most useful to test task g, in the script g.py
 
 \> python3 g_test.py
 
-The program will output a lot of warnings, which comes from Sci-kit learn's modules. However, it should be fine as long as you don't encounter any errors.
+The program will output a lot of warnings, which comes from Sci-kit learn's modules. However, it should be fine as long as you don't encounter any errors. When the program is done running, it writes results to file. These are the lowest MSEs on the test data from the different regression and resampling methods.
