@@ -1,0 +1,23 @@
+OLS
+n = 30 degree = 7.0
+MSE = 0.001761
+OLS with bootstrap
+n = 30 degree = 9.0 bootstraps = 75
+MSE = 0.001026
+OLS with k fold cross validation
+n = 30 degree = 15.0 k = 5
+MSE = 0.0006966
+Ridge with Bootstrap
+The best error with 75.00 bootstraps and lambda 0.00010 and degree = 13.00
+MSE = 0.0009863
+Ridge with Cross Validation
+The best error with 5.00 folds and lambda 0.00010 and degree = 17.00
+MSE = 0.0009998
+min min_error_boot/min_error_cross = 0.9865
+Lasso with Bootstrap
+The best error with 75.00 bootstraps and lambda 0.00010 and degree = 9.00
+MSE = 0.002091
+Lasso with Cross Validation
+The best error with 5.00 folds and lambda 0.00010 and degree = 9.00
+MSE = 0.002128
+min_error_boot/min_error_cross = 0.9825
