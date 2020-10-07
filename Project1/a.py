@@ -11,10 +11,7 @@ def OLS(x,y,z,degree,noise,z_star):
 
     X = X_D(x,y,5)
     beta = beta_(X,np.ravel(z))
-                     #We'll use this for the confidence interval of 95 percent
-
-
-
+    #We'll use this for the confidence interval of 95 percent
 
 
     #OlS without scaled data for fith degree polynomial
@@ -79,7 +76,6 @@ def OLS(x,y,z,degree,noise,z_star):
 
         beta_scaled =  beta_(X_train_scaled,z_train)
         var_beta = var(X_train_scaled,noise)
-        std_beta = np.sqrt(var_beta)*z_star
         z_tilde_scaled_train = X_train_scaled.dot(beta_scaled)
         z_tilde_scaled_test = X_test_scaled.dot(beta_scaled)
 
@@ -92,7 +88,8 @@ def OLS(x,y,z,degree,noise,z_star):
             beta_best = beta_scaled
             MSE_minimum = MSE_test[i-1]
             i_best = i
-        #print("R2_score %.3f %d" %(R2_score[i-1],i))
+            std_beta = np.sqrt(var_beta)*z_star
+            print("R2_score %.3f %d" %(R2_score[i-1],i))
     return MSE_train,MSE_test,beta_scaled,std_beta,ztilde_best,i_best,beta_best
 
 if __name__ == '__main__':
@@ -105,7 +102,7 @@ if __name__ == '__main__':
     x = np.sort(x)
     y = np.sort(y)
     x,y = np.meshgrid(x,y)
-    noise = 0.001
+    noise = 0.1
     noise_arr = noise*np.random.randn(n,n)
     z =FrankeFunction(x,y)+noise
     degree = 5

@@ -68,7 +68,7 @@ if __name__ == '__main__':
     n = 50
     x = np.random.uniform(0,1,n)
     y = np.random.uniform(0,1,n)
-    noise = 0.1 * np.random.randn(n,n)
+    noise = 0.5 * np.random.randn(n,n)
     x = np.sort(x)
     y = np.sort(y)
     x,y = np.meshgrid(x,y)

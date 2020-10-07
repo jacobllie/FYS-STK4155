@@ -61,7 +61,7 @@ if __name__ == '__main__':
     x = np.sort(x)
     y = np.sort(y)
     x,y = np.meshgrid(x,y)
-    noise = 0.1*np.random.randn(n,n)
+    noise = 0.5*np.random.randn(n,n)
     z = np.ravel(FrankeFunction(x,y)+noise)
 
     degree = 30

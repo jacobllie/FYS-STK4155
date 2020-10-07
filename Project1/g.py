@@ -17,11 +17,11 @@ print(terrain.shape)
 x = np.linspace(0,1,len(terrain))
 y = np.linspace(0,1,len(terrain))
 x,y = np.meshgrid(x,y)
-degree = 20
+degree = 40
 deg  = np.linspace(1,degree,degree)
 terrain = np.ravel(terrain)
 terrain_scaled = (terrain-np.min(terrain))/(np.max(terrain)-np.min(terrain))
-
+k = 5
 
 file = open("g_result.txt","w")
 
@@ -32,14 +32,6 @@ _,MSE_OLS,_,_,ztilde,i_best,beta_best = OLS(x,y,np.reshape(terrain_scaled,(n,n))
 file.write("OLS\n")
 file.write("n = {:} degree = {:}\n".format(n,deg[np.argmin(MSE_OLS)]))
 file.write("MSE = {:.4}\n".format(np.min(MSE_OLS)))
-
-k=5
-
-"""method="ridge"
-MSE_fold,R2_score,score,min_error, beta_best, i_best, _ = cross_validation(k,x,y,terrain_scaled,degree,method,0)
-
-
-print(min_error, R2_score[i_best-1], i_best)
 
 terrain = np.reshape(terrain_scaled,(n,n))
 
@@ -56,7 +48,7 @@ plt.subplot(1,2,2)
 plt.axis('off')
 plt.title("Model")
 plt.imshow(z_data, cmap="gist_earth")
-plt.savefig("figures/terrain_image"+method+".png",dpi=1200,bbox_inches = 'tight',pad_inches = 0.1)
+plt.savefig("figures/terrain_image"+"_OLS_"+".png",dpi=1200,bbox_inches = 'tight',pad_inches = 0.1)
 plt.show()
 
 plt.subplot(1,2,1)
@@ -66,18 +58,24 @@ plt.subplot(1,2,2)
 plt.title("Model")
 cp = plt.contour(X,Y,z_data)
 plt.colorbar(cp) # Add a colorbar to a plot
-plt.savefig("figures/terrain_contour"+method+".png",dpi=1200,bbox_inches = 'tight',pad_inches = 0.1)
+plt.savefig("figures/terrain_contour"+"_OLS_"+".png",dpi=1200,bbox_inches = 'tight',pad_inches = 0.1)
 plt.show()
 
 
-
+plt.style.use("seaborn")
 plt.title("Mean squared error with OLS on terrain data")
 plt.xlabel("Complexity")
 plt.ylabel("MSE")
 plt.plot(deg,MSE_OLS,label="OLS")
 plt.legend()
-plt.show()"""
+plt.savefig("figures/terrain_MSE"+"_OLS_"+".png",dpi=1200,bbox_inches = 'tight',pad_inches = 0.1)
+plt.show()
 
+plt.title("Beta coefficients with their confidence intervals calculated for n = {:d}".format(n))
+plt.xlabel(r"$\beta$ ")
+plt.errorbar(x_axis,beta,std_beta,fmt="o")
+plt.savefig("./figures/a_beta.jpg",bbox_inches = 'tight',pad_inches = 0.1,dpi=1200)
+plt.show()
 
 
 
