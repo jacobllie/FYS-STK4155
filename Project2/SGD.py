@@ -8,9 +8,10 @@ from sklearn.utils import resample
 import matplotlib.pyplot as plt
 
 n = 100
+noise = 0.1
 x = np.random.uniform(0,1,n)
 y = np.random.uniform(0,1,n)
-x,y = np.meshgrid(x,y)
+x,y = np.meshgrid(x,y) + noise*np.random.randn(n,n)
 z = np.ravel(FrankeFunction(x,y))
 
 class NN:
@@ -36,7 +37,7 @@ class NN:
         self.D = X
 
     def train_test_split_scale(self, X, z):
-        X_train,X_test,z_train,z_test = train_test_split(X,z,test_size=0.2)
+        X_train,X_test,z_train,z_test = train_test_split(X,z,test_size=0.3)
         scaler = StandardScaler()
         scaler.fit(X_train)
         #X_train_scaled =  scaler.transform(X_train)
@@ -44,15 +45,15 @@ class NN:
         return X_train, X_test, z_train, z_test
 
     def SGD(self, epochs, mini_batch_size, t0, t1, gamma=0, lam=0):
-        weights = np.zeros(self.D.shape[1])
         X_train,X_test,z_train,z_test = self.train_test_split_scale(self.D,self.z)
-        def learning_schedule(t):
-            return t0/(t + t1)
         m = len(z_train)
-        v = 0
-        #eta = 0.0001
+        d = self.D.shape[1]
+        weights = random.randn(d)
+        def learning_schedule(t):
+            return 0.01#/(1+0.000005*t)
         MSE_array = np.ones(epochs)*np.nan
         ind = np.arange(0,m)
+        v = 0
         for i in range(epochs):
             random.shuffle(ind)
             X_train_shuffle = X_train[ind]
@@ -67,7 +68,7 @@ class NN:
             z_pred = X_train@weights
             MSE_array[i] = mean_squared_error(z_train, z_pred)
         MSE = mean_squared_error(z_train, z_pred)
-        plt.plot(MSE_array, 'x')
+        plt.plot(MSE_array, '.')
         plt.xlabel("epoch")
         plt.ylabel("MSE")
         plt.show()
@@ -83,9 +84,9 @@ class NN:
         return weights, MSE
 
 
-my_instance = NN(x, y, z, 20)
+my_instance = NN(x, y, z, 10)
 my_instance.X_D()
-weights, MSE = my_instance.SGD(80, 50, 5, 50, gamma = 0.9)
+weights, MSE = my_instance.SGD(200, 30, 5, 1, gamma = 0.9, lam = 0)
 print(MSE)
 
 weights_OLS, MSE_OLS = my_instance.OLS()
