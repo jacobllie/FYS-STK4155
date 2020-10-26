@@ -21,14 +21,14 @@ class neural_network:
         """
 
         self.network = network
-        self.grid = [[] for i in range(len(network))]
-        for i in range(len(network)):
-            self.grid[i] = np.array([0 for j in range(network[i])])
-        self.grid[0] = np.array(input)
-        self.grid = np.array(self.grid)
-
-
         self.layers = len(network)
+        self.activations = [[] for i in range(self.layers)]
+        for i in range(self.layers):
+            self.activations[i] = np.array([0 for j in range(network[i])])
+        self.activations[0] = np.array(input)
+        self.activations = np.array(self.activations)
+
+
         self.bias = [[] for i in range(self.layers-1)]
         self.weights = [[] for i in range(self.layers-1)]
         for i in range(self.layers-1):
@@ -41,28 +41,39 @@ class neural_network:
         #self.weights = np.array([np.random.randn(y, x) for x, y in zip(network[:-1], network[1:])])
         #print(self.weights)
 
+    def forward(self, act_func="sigmoid", act_func_out="ReLU"):
+        """
+        Activates the network by moving forward through the net.
+        act_func: activation functions in the hidden layers
+        act_func_out: activation function before the output layer
+        """
+        for i in range(self.layers-2):
+            self.activation_function(layer=i, act_func=act_func)
+        self.activation_function(layer=self.layers-2, act_func=act_func_out)
+
+
 
     def activation_function(self, layer, act_func="sigmoid"):
         """
         layer: integer representing the respective layer in the network
         layer = 0 equals first hidden layer.
         act_func: the preferred activation function to use
-        output: adjust the output values on the grid corresponding the layer
+        output: adjust the output values on the 'activations' corresponding the layer
         """
 
-        z_node =  self.weights[layer].T @ self.grid[layer] + self.bias[layer]
+        z_node =  self.weights[layer].T @ self.activations[layer] + self.bias[layer]
 
         if act_func == "sigmoid":
-            self.grid[layer+1] = self.sigmoid(z_node)
+            self.activations[layer+1] = self.sigmoid(z_node)
 
         elif act_func == "step_function" or act_func == "step function":
-            self.grid[layer+1] = self.step_function(z_node)
+            self.activations[layer+1] = self.step_function(z_node)
 
         elif act_func == "tanh":
-            self.grid[layer+1] = self.tanh(z_node)
+            self.activations[layer+1] = self.tanh(z_node)
 
         elif act_func == "ReLU":
-            self.grid[layer+1] = self.ReLU(z_node)
+            self.activations[layer+1] = self.ReLU(z_node)
 
         else:
             msg = "Need to define activation function! (%s) is illegal. Try sigmoid, step function, tanh, ReLU..." % act_func
@@ -104,30 +115,118 @@ class neural_network:
             test = 0
 
 
-    def da_dz(self, node, step_func="sigmoid"):
-        if step_func == "sigmoid":
-            act = sigmoid(node)
-        if step_func == "step_function" or step_func == "step function":
-            act = step_function(node)
-        if step_func == "tanh":
-            act = tanh(node)
-        if step_func == "ReLU":
-            act = ReLU(node)
 
-        return act - act**2
+    # following functions are part of the backtracking algorithm
+    def da_dz(self, layer):
+        return self.activations[layer] - self.activations[layer]**2
+
+    # the derivative of the cost function with respect to weights at the output layer
+    def dc_dw_L(self):
+        return self.delta_L(target) * self.activations[-2] # -2 because we want the values from the last hidden layer
+
+    # calculates the derivative of cost function with respect to the activations
+    def dc_da_L(self, target):
+        return self.activations[-1] - target
+
+    # computing error in output layer
+    def delta_L(self, target):
+        return self.da_dz(self.layers-1) * self.dc_da_L(target)
+
+    # computes error in the hidden layers
+    def delta(self, layer, delta_front):
+        deltas = np.zeros(self.network[layer])
+        for i in range(len(deltas)):
+            deltas[i] = deltas[i] + np.sum(delta_front * self.weights[layer][i] * self.activations[layer][i])
+        return deltas
 
 
-    def back_propagation(self):
-        test = 0
+
+    # performing the back propagation algorithm to adjust bias and weights
+    def back_propagation(self, target, eta=0.1):
+        err = self.activations[1:]*0
+        err[-1] = self.delta_L(target)
+        for i in range(1, len(err)):
+            lay = len(self.network) - i - 1
+            err[-i-1] = self.delta(lay, err[-i])
+
+
+        for i in range(len(self.weights)):
+            for j in range(self.weights[i].shape[0]):
+                self.weights[i][j] = self.weights[i][j] - eta*err[i]*self.activations[i][j]
+                #for k in range(self.weights[i].shape[1]):
+                    #print(i, j, k, self.weights[i].shape)
+                    #print(err[i], err[i].shape)
+                    #print(self.activations[i], self.activations[i].shape)
+                    #print()
+                    #self.weights[i][j][k] = self.weights[i][j][k] - eta*err[i][k]*self.activations[i][j]
+
+        self.bias = self.bias - eta*err
 
 
 
 
 
 
+"""
 inputs = [2.2, 3.1, -0.3]
+targets = [5, 2]
+
 net = [len(inputs), 4, 2]           # test of network size
 NN = neural_network(net, inputs)
-#NN.activation_function(0, "sigmoid")
-#NN.activation_function(1, "sigmoid")
-#print(NN.grid)
+for i in range(len(net)-1):
+    NN.activation_function(i)
+NN.back_propagation(targets)targets
+#print(NN.activations)
+"""
+
+
+
+# testing with linear funcitions that are to a*x + b + noise
+# object is to make the algorithm estimate a and b
+a = 0.5
+b = 2
+x = np.linspace(0,3,2)
+lines = 10
+params = np.ones((2,lines))
+params[0,:], params[1,:] = a, b
+params = params + 0.1*np.random.randn(2,lines)
+
+
+# just plotting the individual lines
+plt.figure(figsize=(10,7))
+for i in range(len(params[0])):
+    plt.plot(x, params[0][i]*x+params[1][i])
+
+# setting up the neural network
+net = [len(params.flatten()), 5, 2]           # define the size of the network
+NN = neural_network(network=net, input=params.flatten())
+
+
+# runs the neural network once
+NN.forward(act_func_out="sigmoid")
+a_NN, b_NN = NN.activations[-1]
+plt.plot(x, a_NN*x + b_NN, "--", color="red",
+        label="Before BP (a=%.3f, b=%.3f)" % (a_NN, b_NN))
+
+
+# backtracking the number of times we have data (lines)
+for back_tracks in range(lines):
+    A = params[0, back_tracks]
+    B = params[1, back_tracks]
+    NN.back_propagation([A,B], eta=0.1)#/(1+back_tracks))
+    NN.forward(act_func_out="sigmoid")
+    #a_NN, b_NN = NN.activations[-1]
+    #plt.plot(x, a_NN*x + b_NN, label="After %i BT's" % (back_tracks+1))
+
+a_NN, b_NN = NN.activations[-1]
+plt.plot(x, a_NN*x+b_NN, "--", color="black",
+        label="After %i BP's (a=%.3f, b=%.3f)" % (back_tracks+1, a_NN, b_NN))
+plt.grid(); plt.legend()
+#print(test_target[-1]-test_target[0], (a_NN*x+b_NN)[-1]-(a_NN*x+b_NN)[0])
+plt.tight_layout();plt.show()
+
+
+
+
+
+#
