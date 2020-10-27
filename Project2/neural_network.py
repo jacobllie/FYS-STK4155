@@ -10,7 +10,7 @@ np.random.seed(100)
 
 class neural_network:
 
-    def __init__(self, network, input):
+    def __init__(self, network, input=None):
         """
         'network' is a list where its length defines the number of layers
         and the values of the elements represents the number of neurons in
@@ -25,7 +25,7 @@ class neural_network:
         self.activations = [[] for i in range(self.layers)]
         for i in range(self.layers):
             self.activations[i] = np.array([0 for j in range(network[i])])
-        self.activations[0] = np.array(input)
+        #self.activations[0] = np.array(input)
         self.activations = np.array(self.activations)
 
 
@@ -41,15 +41,17 @@ class neural_network:
         #self.weights = np.array([np.random.randn(y, x) for x, y in zip(network[:-1], network[1:])])
         #print(self.weights)
 
-    def forward(self, act_func="sigmoid", act_func_out="ReLU"):
+    def forward(self, input, act_func="sigmoid", act_func_out="ReLU"):
         """
         Activates the network by moving forward through the net.
+        input: the inputs that the network will evaluate
         act_func: activation functions in the hidden layers
         act_func_out: activation function before the output layer
         """
-        for i in range(self.layers-2):
+        self.activations[0] = input
+        for i in range(self.layers-1):
             self.activation_function(layer=i, act_func=act_func)
-        self.activation_function(layer=self.layers-2, act_func=act_func_out)
+        #self.activation_function(layer=self.layers-2, act_func=act_func_out)
 
 
 
@@ -181,52 +183,53 @@ NN.back_propagation(targets)targets
 
 
 
-# testing with linear funcitions that are to a*x + b + noise
-# object is to make the algorithm estimate a and b
-a = 0.5
-b = 2
-x = np.linspace(0,3,2)
-lines = 10
-params = np.ones((2,lines))
-params[0,:], params[1,:] = a, b
-params = params + 0.1*np.random.randn(2,lines)
+# testing with linear functions that are a*x + b + noise
+# object is to make the NN estimate a and b
+lines = 1000
+data_points = 50
+a =  np.array([r.randint(-5,5) for i in range(lines)])
+b = np.array([r.randint(-2,2) for i in range(lines)])
+x = np.linspace(0, 3, data_points)
+all_lines = np.zeros((lines, data_points))
 
+for i in range(lines):
+    noise = 0.5*np.random.randn(data_points)
+    all_lines[i,:] = a[i]*x + b[i] + noise
 
-# just plotting the individual lines
+"""
+# just plotting the individual data sets
+plt.close()
 plt.figure(figsize=(10,7))
-for i in range(len(params[0])):
-    plt.plot(x, params[0][i]*x+params[1][i])
+for i in range(lines):
+    plt.plot(x, all_lines[i], ".")
+plt.grid()
+plt.show()
+"""
 
 # setting up the neural network
-net = [len(params.flatten()), 5, 2]           # define the size of the network
-NN = neural_network(network=net, input=params.flatten())
+#net = [len(all_lines.flatten()), 4, 2]           # define the size of the network
+net = [2*data_points, 15, 2]           # define the size of the network
+NN = neural_network(network=net)
+
+# backtracking a certain number of times (equal the times we iplement test data
+# on the neural network)
+for i in range(lines-1):
+    NN.forward(input=np.append(x, all_lines[i,:]))
+    NN.back_propagation(target=[a[i], b[i]], eta=0.01)
 
 
-# runs the neural network once
-NN.forward(act_func_out="sigmoid")
+# test data sent into the neural network
+NN.forward(input=np.append(x, all_lines[-1,:]))
 a_NN, b_NN = NN.activations[-1]
-plt.plot(x, a_NN*x + b_NN, "--", color="red",
-        label="Before BP (a=%.3f, b=%.3f)" % (a_NN, b_NN))
 
 
-# backtracking the number of times we have data (lines)
-for back_tracks in range(lines):
-    A = params[0, back_tracks]
-    B = params[1, back_tracks]
-    NN.back_propagation([A,B], eta=0.1)#/(1+back_tracks))
-    NN.forward(act_func_out="sigmoid")
-    #a_NN, b_NN = NN.activations[-1]
-    #plt.plot(x, a_NN*x + b_NN, label="After %i BT's" % (back_tracks+1))
-
-a_NN, b_NN = NN.activations[-1]
-plt.plot(x, a_NN*x+b_NN, "--", color="black",
-        label="After %i BP's (a=%.3f, b=%.3f)" % (back_tracks+1, a_NN, b_NN))
-plt.grid(); plt.legend()
-#print(test_target[-1]-test_target[0], (a_NN*x+b_NN)[-1]-(a_NN*x+b_NN)[0])
-plt.tight_layout();plt.show()
-
-
-
+last_line = all_lines[-1,:]
+plt.title("Trained the NN with %i data sets" % (lines-1))
+plt.plot(x, last_line, ".", label="Test line w/ noise", color="red")
+plt.plot(x, a[-1]*x+b[-1], label="Test line w/o noise (a=%i, b=%i)" % (a[-1], b[-1]), color="red")
+plt.plot(x, a_NN*x+b_NN, label="NN line (a=%.3f, b=%.3f)" % (a_NN, b_NN), color="black")
+plt.legend(); plt.grid(); plt.tight_layout()
+plt.show()
 
 
 #
