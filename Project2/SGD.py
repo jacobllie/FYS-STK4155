@@ -26,9 +26,9 @@ class NN:
             x = np.ravel(self.x)    #flatten x
             y = np.ravel(self.y)
         self.N = len(x)
-        l = int((self.p+1)*(self.p+2)/2) #number of columns in beta
+        self.l = int((self.p+1)*(self.p+2)/2) #number of columns in beta
 
-        X = np.ones((self.N,l))
+        X = np.ones((self.N,self.l))
 
         for i in range(1,self.p+1):     #looping over the degrees but we have 21 elements
             q = int(i*(i+1)/2)           #getting the odd numbers 1.3.5 etc.
@@ -47,8 +47,7 @@ class NN:
     def SGD(self, epochs, mini_batch_size, t0, t1, gamma=0, lam=0):
         X_train,X_test,z_train,z_test = self.train_test_split_scale(self.D,self.z)
         m = len(z_train)
-        d = self.D.shape[1]
-        weights = random.randn(d)
+        weights = random.randn(self.l)
         def learning_schedule(t):
             return 0.01#/(1+0.000005*t)
         MSE_array = np.ones(epochs)*np.nan
@@ -83,6 +82,8 @@ class NN:
         MSE = mean_squared_error(z_train, z_pred)
         return weights, MSE
 
+    def FF(self, layers):
+        weights = random.randn(self.l)
 
 my_instance = NN(x, y, z, 10)
 my_instance.X_D()
