@@ -17,14 +17,14 @@ class tanh:
 class relu:
     def call(self,z):
         if z <= 0:
-            return 0
+            return np.zeros(z.shape)
         else:
             return z
     def deriv(self,z):
         if z <= 0:
-            return 0
+            return np.zeros(z.shape)
         else:
-            return 1
+            return np.ones(z.shape)
 
 class leaky_relu:
     def __call__(self,z):
@@ -35,9 +35,9 @@ class leaky_relu:
 
     def deriv(self,z):
         if z <= 0:
-            return 0
+            return np.zeros(z.shape)
         else:
-            return 1
+            return np.ones(z.shape)
 class elu:
     def __call__(self,z,alpha):
         if z <= 0:
@@ -48,4 +48,11 @@ class elu:
         if z<=0:
             return alpha*(np.exp(z)-1) + alpha
         else:
-            return 1
+            return np.ones(z.shape)
+
+class identity:
+    def __call__(selx,z):
+        return z
+
+    def deriv(self,z):
+        return np.ones(z.shape)
