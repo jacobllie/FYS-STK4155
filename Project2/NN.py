@@ -113,8 +113,8 @@ if __name__ == "__main__":
     from keras.regularizers import l2
     from keras.optimizers import SGD
 
-    epochs = 100
-    batch_size = n
+    epochs = 1000
+    batch_size = len(x_train)
     n_neurons_layer1 = 10
     n_neurons_layer2 = 5
     n_categories = 1
@@ -136,15 +136,7 @@ if __name__ == "__main__":
     DNN_keras = np.zeros((len(eta_vals), len(lmbd_vals)), dtype=object)
 
 
-
-
-
-
-
-
-
-
-    for i, eta in enumerate(eta_vals):
+for i, eta in enumerate(eta_vals):
         for j, lmbd in enumerate(lmbd_vals):
             DNN = create_neural_network_keras(n_neurons_layer1, n_neurons_layer2, n_categories,eta=eta, lmbd=lmbd)
             DNN.fit(x_train, train_output, epochs=epochs, batch_size=batch_size, verbose=0)
