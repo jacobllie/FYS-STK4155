@@ -1,6 +1,8 @@
 import numpy as np
 
 class sigmoid:
+    """def __init__(self):       #it might need an init to work
+        pass"""
     def __call__(self,z):
         return 1/(1+np.exp(-z))
     def deriv(self,z):
@@ -8,9 +10,9 @@ class sigmoid:
 
 class tanh:
     def __call__(self,z):
-        return (np.exp(weight_sum)-np.exp(-weight_sum))/(np.exp(weight_sum)+np.exp(-weight_sum))
+        return (np.exp(z)-np.exp(-z))/(np.exp(z)+np.exp(-z))
     def deriv(self,z):
-        return 1-((np.exp(weight_sum)-np.exp(-weight_sum))/(np.exp(weight_sum)+np.exp(-weight_sum)))**2
+        return 1-((np.exp(z)-np.exp(-z))/(np.exp(z)+np.exp(-z)))**2
 
 class relu:
     def call(self,z):
@@ -49,7 +51,27 @@ class elu:
             return np.ones(z.shape)
 
 class identity:
-    def __call__(selx,z):
+    def __call__(self,z):
         return z
+
     def deriv(self,z):
         return np.ones(z.shape)
+
+"""class softmax:
+    def __call__(self,z):
+        #sum = np.sum(np.exp(z), axis=1).reshape(-1,1)
+        sum = np.sum(np.exp(z))
+
+        return np.exp(z)/sum #dividing all the rows with the sum of its column.
+
+    def deriv(self,z):
+        #print(self.__call__(z)-(self.__call__(z))**2)
+        return self.__call__(z)-(self.__call__(z))**2  #assume softmax-softmax**2 because we're on the output layer"""
+
+class softmax:
+    def __call__(self, z):
+        return np.exp(z)/np.sum(np.exp(z), axis=1)[:, None]
+
+    def deriv(self, z):
+        return self.__call__(z) - (self.__call__(z))**2
+        # z * np.ones(len(z)).T.dot(np.eye(len(z)) - np.ones(len(z))*z.T)
