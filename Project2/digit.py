@@ -6,7 +6,6 @@ from activation_function import sigmoid,softmax,identity
 from functions import FrankeFunction
 from data_prep import data_prep
 from NN import dense_layer,NN,MSE
-from activation_function import sigmoid,softmax,identity
 from cost_functions import accuracy
 
 # download MNIST dataset
@@ -42,15 +41,23 @@ network = NN(layers)
 mse = MSE()
 #print(mse(Y_test, network.feed_forward(X_test)))
 network.feed_forward(X_train)  #sending in x and y from design matrix.
-for i in range(500):
-    network.backprop(mse, X_train, one_hot, 0.1)
+for i in range(1000):
+    network.backprop(mse, X_train, one_hot, 2)
 
 #Test the network on the test data
 Y_tilde = network.feed_forward(X_test)
 #print(mse(Y_test, Y_tilde))
 
-for i in range(50):
+S = 0
+for i in range(Y_test.shape[0]):
     print("|    %d   |   %d  |" %(Y_test[i], np.argmax(Y_tilde[i])))
+    if Y_test[i] == np.argmax(Y_tilde[i]):
+        S+=1
+
+S = S/Y_test.shape[0]
+
+print("accuracy = %.3f" %(S*100))
+print("accuracy = %.3f" %(accuracy()(Y_test.ravel(), np.argmax(Y_tilde, axis=1))*100))
 
 # choose some random images to display
 indices = np.arange(len(inputs))
