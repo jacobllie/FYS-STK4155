@@ -41,8 +41,16 @@ layer5 = dense_layer(20, 10, softmax())
 layers = [layer1, layer2, layer3, layer4, layer5]
 network = NN(layers)
 mse = MSE()
+
+cost_array = np.zeros((1000,2))
 for i in range(1000):
     network.backprop(mse, X_train, one_hot, 2)
+    Y_pred = np.argmax(network.feed_forward(X_test), axis=1)
+    Y_pred_train = np.argmax(network.feed_forward(X_train), axis=1)
+    cost_array[i,0] = accuracy()(Y_test.ravel(), Y_pred)*100
+    cost_array[i,1] = accuracy()(Y_train.ravel(), Y_pred_train)*100
+plt.plot(cost_array)
+plt.show()
 
 #Test the network on the test data
 Y_tilde = network.feed_forward(X_test)
