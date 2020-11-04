@@ -1,28 +1,33 @@
 import numpy as np
 
 class MSE:
+    """
+    Mean squared error cost function
+    """
     def __call__(self, y, a):
-        return 1/len(y)*np.sum(a - y)**2
+        return 1/len(y)*np.sum((a - y)**2)
 
     def deriv(self, y, a):
         return 2/len(y)*(a - y)
 
 class accuracy:
-    def __call__(self,y,a):
-        I = [1 for i in range(len(y)) if y[i]==a[i]]
-        return np.sum(I)/len(y)
-        
+    """
+    Returns % of success in predictions. Only a measure
+    """
+    def __call__(self, y, a):
+        return np.mean(y == a)
+
     def deriv(self):
-        return 0.01
+        raise AttributeError("accuracy is only a measure and does not have a\
+            derivative. Try a different cost function.")
 
 class CE:
-    def __call__(self,y,a):
-        m = len(y)
-        return -(1/m) * np.sum(y-np.log(a) + (1-y)*np.log(1-a))
+    """
+    Log cross-entropy cost function.
+    """
+    def __call__(self, y, a):
+        #return -np.sum(y*np.log(P(a)) + (1-y)*np.log(1 - np.log(P(a))))
+        return -np.sum(a*(1-y) - np.log(1 + np.exp(-a)))
 
-    def deriv(self,y,a):
-        m = len(y)
-        derivs = []
-        for i in range(m):
-            derivs.append((1/m) * np.sum((a - y) * a[i], axis=0))
-        return np.array(derivs)
+    def deriv(self, y, a):
+        return -(y - 1 + 1/(1 + np.exp(a)))

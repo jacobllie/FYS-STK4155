@@ -30,7 +30,7 @@ class NN:
             a = layer(a)
         return a
 
-    def backprop(self, cost, x, y, eta):
+    def backprop(self, cost, x, y, eta, penalty):
         self.feed_forward(x)  #using the updated weights and biases to get new output layer
         #Starting with output layer
         L = self.layers
@@ -45,7 +45,8 @@ class NN:
             L[i].b = L[i].b - eta * delta_l[0,:]
         #Updating the first hidden layer with the new weights and biases.
         delta_l = (delta_l @ L[1].weights.T) * L[0].da
-        L[0].weights = L[0].weights - eta*(x.T @ delta_l)
+        L[0].weights = L[0].weights - eta*(x.T @ delta_l) \
+            - eta*penalty*L[0].weights/len(y)
         L[0].b = L[0].b - eta*delta_l[0,:]
 
     def logreg_backprop(self, cost, x, y, eta):

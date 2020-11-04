@@ -5,8 +5,8 @@ from sklearn import datasets
 from activation_function import sigmoid,softmax,identity
 from functions import FrankeFunction
 from data_prep import data_prep
-from NN import dense_layer,NN,MSE
-from cost_functions import accuracy
+from NN import dense_layer, NN
+from cost_functions import accuracy, MSE
 
 plt.rcParams.update({'font.size': 14})
 
@@ -44,7 +44,7 @@ mse = MSE()
 
 cost_array = np.zeros((1000,2))
 for i in range(1000):
-    network.backprop(mse, X_train, one_hot, 2)
+    network.backprop(mse, X_train, one_hot, 0.5, 5)
     Y_pred = np.argmax(network.feed_forward(X_test), axis=1)
     Y_pred_train = np.argmax(network.feed_forward(X_train), axis=1)
     cost_array[i,0] = accuracy()(Y_test.ravel(), Y_pred)*100
