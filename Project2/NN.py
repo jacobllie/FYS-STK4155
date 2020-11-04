@@ -30,7 +30,7 @@ class NN:
             a = layer(a)
         return a
 
-    def backprop(self, cost, x, y, eta, penalty):
+    def backprop(self, cost, x, y, eta, penalty=0):
         self.feed_forward(x)  #using the updated weights and biases to get new output layer
         #Starting with output layer
         L = self.layers
