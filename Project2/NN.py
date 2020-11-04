@@ -31,14 +31,13 @@ class NN:
         return a
 
     def backprop(self, cost, x, y, eta):
+        self.feed_forward(x)  #using the updated weights and biases to get new output layer
         #Starting with output layer
         L = self.layers
         a = L[-1].a
         delta_l = cost.deriv(y, a)*L[-1].da
         #Looping over layer from output to 1st hidden
-        for i in reversed(range(1, len(L)-1)):      #we only backprop until L-2 layer
-            #print(L[i+1].weights.T.shape)
-            #print(delta_l.shape)
+        for i in reversed(range(1, len(L)-1)):      #we only backprop until L - 2 layer
             delta_l = (delta_l @ L[i+1].weights.T) * L[i].da
             #Updating weights
             L[i].weights = L[i].weights - eta*(L[i-1].a.T @ delta_l)
@@ -49,7 +48,15 @@ class NN:
         L[0].weights = L[0].weights - eta*(x.T @ delta_l)
         L[0].b = L[0].b - eta*delta_l[0,:]
 
+    def logreg_backprop(self, cost, x, y, eta):
         self.feed_forward(x)  #using the updated weights and biases to get new output layer
+        #Starting with output layer
+        L = self.layers
+        a = L[0].a
+        delta_l = cost.deriv(y, a)*L[0].da
+        #Updating output layer with the new weights and biases.
+        L[0].weights = L[0].weights - eta*(x.T @ delta_l)
+        L[0].b = L[0].b - eta*delta_l[0,:]
 
 
 #Test case
@@ -82,8 +89,6 @@ if __name__ == "__main__":
     #Finding MSE on untrained network
     mse = MSE()
     print("Test MSE before training network: %.4f" %mse(test_output, network.feed_forward(x_test)))
-    #Feed-forward on train data
-    network.feed_forward(x_train)
     #Back-propagation
     for i in range(epochs):
         network.backprop(mse, x_train, train_output, eta)
@@ -122,4 +127,4 @@ if __name__ == "__main__":
     DNN.fit(x_train, train_output, epochs=epochs, batch_size=batch_size, verbose=0)
     scores = DNN.evaluate(x_test, test_output)
 
-    print("Test mse from Keras: %.3f" % scores)
+    print("Test MSE from Keras: %.3f" % scores)
