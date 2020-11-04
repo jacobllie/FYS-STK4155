@@ -15,29 +15,31 @@ class tanh:
         return 1-((np.exp(z)-np.exp(-z))/(np.exp(z)+np.exp(-z)))**2
 
 class relu:
-    def call(self,z):
-        if z <= 0:
-            return np.zeros(z.shape)
-        else:
-            return z
+    def __call__(self,z):
+        z = np.array(z)
+        z_neg = np.where(z < 0)
+        z[z_neg] = 0
+        return z
     def deriv(self,z):
-        if z <= 0:
-            return np.zeros(z.shape)
-        else:
-            return np.ones(z.shape)
+        z = np.array(z)
+        z_neg = np.where(z < 0)
+        z[:] = 1
+        z[z_neg] = 0
+        return z
 
 class leaky_relu:
-    def __call__(self,z):
-        if z <= 0:
-            return 0.1*z
-        else:
-            return z
+    def __call__(self, z, alpha=0.1):
+        z = np.array(z)
+        z_neg = np.where(z < 0)
+        z[z_neg] = alpha*z[z_neg]
+        return z
+    def deriv(self, z, alpha=0.1):
+        z = np.array(z)
+        z_neg = np.where(z < 0)
+        z[:] = 1
+        z[z_neg] = alpha
+        return z
 
-    def deriv(self,z):
-        if z <= 0:
-            return np.zeros(z.shape)
-        else:
-            return np.ones(z.shape)
 class elu:
     def __call__(self,z,alpha):
         if z <= 0:
