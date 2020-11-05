@@ -59,20 +59,10 @@ class identity:
     def deriv(self,z):
         return np.ones(z.shape)
 
-"""class softmax:
-    def __call__(self,z):
-        #sum = np.sum(np.exp(z), axis=1).reshape(-1,1)
-        sum = np.sum(np.exp(z))
-
-        return np.exp(z)/sum #dividing all the rows with the sum of its column.
-
-    def deriv(self,z):
-        #print(self.__call__(z)-(self.__call__(z))**2)
-        return self.__call__(z)-(self.__call__(z))**2  #assume softmax-softmax**2 because we're on the output layer"""
 
 class softmax:
     def __call__(self, z):
-        return np.exp(z)/np.sum(np.exp(z), axis=1)[:, None]
+        return np.exp(z-np.max(z))/np.sum(np.exp(z-np.max(z)), axis=1)[:, None]
 
     def deriv(self, z):
         return self.__call__(z) - (self.__call__(z))**2
