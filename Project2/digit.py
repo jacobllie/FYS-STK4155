@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import random
+import seaborn as sb
 import matplotlib.pyplot as plt
 from sklearn import datasets
 from activation_function import sigmoid,softmax,identity
@@ -41,46 +42,54 @@ layer3 = dense_layer(80, 50, sigmoid())
 layer4 = dense_layer(50, 20, sigmoid())
 layer5 = dense_layer(20, 10, softmax())
 
-epochs = 100
-eta = 0.05
-penalty = 0.5
 
 layers = [layer1, layer2, layer5]
-network = NN(layers)
 mse = MSE()
 m = X_train.shape[0]
-mini_batch_size = 30
-cost_array = np.zeros((epochs,2))
 batch = np.arange(0,m)
-for i in range(epochs):
-    random.shuffle(batch)
-    X_train = X_train[batch]
-    one_hot = one_hot[batch]
-    Y_train = Y_train[batch]
-    for j in range(0, m, mini_batch_size):
-        network.backprop(mse, X_train[j:j+mini_batch_size],
-            one_hot[j:j+mini_batch_size], eta, penalty)
-    Y_pred = np.argmax(network.feed_forward(X_test), axis=1)
-    Y_pred_train = np.argmax(network.feed_forward(X_train), axis=1)
-    cost_array[i,0] = accuracy()(Y_test.ravel(), Y_pred)*100
-    cost_array[i,1] = accuracy()(Y_train.ravel(), Y_pred_train)*100
-plt.plot(cost_array[:,1], label="Train")
-plt.plot(cost_array[:,0], label="Test")
-plt.xlabel("Epochs")
-plt.ylabel("Accuracy")
-plt.legend()
-plt.show()
 
-print("accuracy on train data = %.3f" %cost_array[-1, 1])
-print("accuracy on test data = %.3f" %cost_array[-1, 0])
+def epoch(eta, penalty, epochs=200, mini_batch_size = 100):
+    network = NN(layers)
+    cost_array = np.zeros((epochs,2))
+    for i in range(epochs):
+        random.shuffle(batch)
+        X_train_shuffle = X_train[batch]
+        one_hot_shuffle = one_hot[batch]
+        Y_train_shuffle = Y_train[batch]
+        for j in range(0, m, mini_batch_size):
+            network.backprop(mse, X_train_shuffle[j:j+mini_batch_size],
+                one_hot_shuffle[j:j+mini_batch_size], eta, penalty)
+        Y_pred = np.argmax(network.feed_forward(X_test), axis=1)
+        Y_pred_train = np.argmax(network.feed_forward(X_train_shuffle), axis=1)
+        cost_array[i,0] = accuracy()(Y_test.ravel(), Y_pred)
+        cost_array[i,1] = accuracy()(Y_train_shuffle.ravel(), Y_pred_train)
+    """plt.plot(cost_array[:,1], label="Train")
+    plt.plot(cost_array[:,0], label="Test")
+    plt.xlabel("Epochs")
+    plt.ylabel("Accuracy")
+    plt.legend()
+    plt.show()"""
+    print("accuracy on train data = %.3f" %cost_array[-1, 1])
+    print("accuracy on test data = %.3f" %cost_array[-1, 0])
+    return cost_array[-1]
 
-# choose some random images to display
+penalties = np.logspace(-2,0,11)
+etas = np.logspace(-3,-1,11)
+accuracy_map = np.zeros((len(penalties), len(etas), 2))
 
-for i in range(5):
-    plt.subplot(1, 5, i+1)
-    plt.axis('off')
-    plt.imshow(data.images[ind][i+10], cmap=plt.cm.gray_r, interpolation='nearest')
-    plt.title("Label: %d" %data.target[ind][i+10])
-    plt.text(1, -4, "Pred: %d" %Y_pred[i+10], fontsize=16)
+for i, penalty in enumerate(penalties):
+    for k, eta in enumerate(etas):
+        accuracy_map[k, i] = epoch(eta, penalty)
 
-plt.show()
+np.save("accuracy_map.npy", accuracy_map)
+
+def plot_pictures(k):
+    #k determines which pictures to plot
+    # choose some random images to display
+    for i in range(5):
+        plt.subplot(1, 5, i+1)
+        plt.axis('off')
+        plt.imshow(data.images[ind][i+k], cmap=plt.cm.gray_r, interpolation='nearest')
+        plt.title("Label: %d" %data.target[ind][i+k])
+        plt.text(1, -4, "Pred: %d" %Y_pred[i+k], fontsize=16)
+    plt.show()
