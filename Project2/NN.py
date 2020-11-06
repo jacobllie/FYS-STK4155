@@ -7,7 +7,7 @@ from data_prep import data_prep
 from functions import FrankeFunction
 from cost_functions import MSE
 
-random.seed(100)
+random.seed(80)
 
 class dense_layer:
     def __init__(self, inputs, outputs, act_func):
@@ -49,7 +49,7 @@ class NN:
             - eta*penalty*L[0].weights/len(y)
         L[0].b = L[0].b - eta*delta_l[0,:]
 
-    def logreg_backprop(self, cost, x, y, eta):
+    def backprop2layer(self, cost, x, y, eta):
         self.feed_forward(x)  #using the updated weights and biases to get new output layer
         #Starting with output layer
         L = self.layers
