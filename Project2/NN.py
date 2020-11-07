@@ -1,15 +1,15 @@
-from numpy import random
-from activation_function import sigmoid, identity, relu, leaky_relu,softmax
 import numpy as np
-from numpy import random
 import matplotlib.pyplot as plt
+from numpy import random
+
+from activation_function import sigmoid, identity, relu, leaky_relu,softmax
 from data_prep import data_prep
 from functions import FrankeFunction
 from cost_functions import MSE
 
-random.seed(80)
+#random.seed(80)
 
-class dense_layer:
+class DenseLayer:
     def __init__(self, inputs, outputs, act_func):
         self.weights = random.randn(inputs, outputs)
         self.b = random.randn(1, outputs)
@@ -25,13 +25,13 @@ class NN:
     def __init__(self, layers):
         self.layers = layers
 
-    def feed_forward(self, a):
+    def feedforward(self, a):
         for layer in self.layers:
             a = layer(a)
         return a
 
     def backprop(self, cost, x, y, eta, penalty=0):
-        self.feed_forward(x)  #using the updated weights and biases to get new output layer
+        self.feedforward(x)  #using the updated weights and biases to get new output layer
         #Starting with output layer
         L = self.layers
         a = L[-1].a
@@ -40,24 +40,26 @@ class NN:
         for i in reversed(range(1, len(L)-1)):      #we only backprop until L - 2 layer
             delta_l = (delta_l @ L[i+1].weights.T) * L[i].da
             #Updating weights
-            L[i].weights = L[i].weights - eta*(L[i-1].a.T @ delta_l)
+            L[i].weights = L[i].weights - eta*(L[i-1].a.T @ delta_l) \
+                - eta*penalty*L[i].weights/len(y)
             #Updating biases
-            L[i].b = L[i].b - eta * delta_l[0,:]
+            L[i].b = L[i].b - eta * delta_l[0, :]
         #Updating the first hidden layer with the new weights and biases.
         delta_l = (delta_l @ L[1].weights.T) * L[0].da
         L[0].weights = L[0].weights - eta*(x.T @ delta_l) \
             - eta*penalty*L[0].weights/len(y)
-        L[0].b = L[0].b - eta*delta_l[0,:]
+        L[0].b = L[0].b - eta*delta_l[0, :]
 
     def backprop2layer(self, cost, x, y, eta):
-        self.feed_forward(x)  #using the updated weights and biases to get new output layer
+        self.feedforward(x)  #using the updated weights and biases to get new output layer
         #Starting with output layer
         L = self.layers
         a = L[0].a
         delta_l = cost.deriv(y, a)*L[0].da
         #Updating output layer with the new weights and biases.
-        L[0].weights = L[0].weights - eta*(x.T @ delta_l)
-        L[0].b = L[0].b - eta*delta_l[0,:]
+        L[0].weights = L[0].weights - eta*(x.T @ delta_l) \
+            - eta*penalty*L[0].weights/len(y)
+        L[0].b = L[0].b - eta*delta_l[0, :]
 
 
 #Test case
@@ -67,35 +69,35 @@ if __name__ == "__main__":
     n = 100
     noise = 0.1
     eta = 0.05
-    x = np.random.uniform(0,1,n)
-    y = np.random.uniform(0,1,n)
-    x,y = np.meshgrid(x,y)
-    z = np.ravel(FrankeFunction(x,y) + noise*np.random.randn(n,n))
+    x = np.random.uniform(0, 1, n)
+    y = np.random.uniform(0, 1, n)
+    x, y = np.meshgrid(x, y)
+    z = np.ravel(FrankeFunction(x, y) + noise*np.random.randn(n, n))
 
     data = data_prep()
-    X = data.X_D(x,y,z,1)    #X_train,X_test,z_train,z_test
-    train_input,test_input,train_output,test_output = data.train_test_split_scale()
+    X = data.X_D(x, y, z, 1)    #X_train,X_test,z_train,z_test
+    train_input, test_input, train_output, test_output = data.train_test_split_scale()
 
-    train_output = np.reshape(train_output,(-1,1))               #the shape was (x,) we needed (x,1) for obvious reasons
-    test_output = np.reshape(test_output,(-1,1))
-    x_train = train_input[:, [1,2]]
-    x_test = test_input[:, [1,2]]
+    train_output = np.reshape(train_output,(-1, 1))               #the shape was (x,) we needed (x,1) for obvious reasons
+    test_output = np.reshape(test_output,(-1, 1))
+    x_train = train_input[:, [1, 2]]
+    x_test = test_input[:, [1, 2]]
 
     #Setting up network
-    layer1 = dense_layer(2, 10, sigmoid())
-    layer2 = dense_layer(10, 6, sigmoid())
-    layer3 = dense_layer(6, 1, identity())
+    layer1 = DenseLayer(2, 10, sigmoid())
+    layer2 = DenseLayer(10, 6, sigmoid())
+    layer3 = DenseLayer(6, 1, identity())
     layers = [layer1, layer2, layer3]
     network = NN(layers)
     #Finding MSE on untrained network
     mse = MSE()
-    print("Test MSE before training network: %.4f" %mse(test_output, network.feed_forward(x_test)))
+    print("Test MSE before training network: %.4f" %mse(test_output, network.feedforward(x_test)))
     #Back-propagation
     for i in range(epochs):
         network.backprop(mse, x_train, train_output, eta)
 
     #Test the network on the test data
-    print("Test MSE after training network: %.4f" %mse(test_output, network.feed_forward(x_test)))
+    print("Test MSE after training network: %.4f" %mse(test_output, network.feedforward(x_test)))
 
     #comparing with tensorflow and sklearn
     import tensorflow as tf
