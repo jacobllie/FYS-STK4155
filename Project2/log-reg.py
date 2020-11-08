@@ -1,18 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
 from numpy import random
 from sklearn import datasets
-
 from activation_function import sigmoid, softmax, identity
 from functions import FrankeFunction
 from data_prep import data_prep
-from NN import dense_layer, NN
+from NN import DenseLayer, NN
 from cost_functions import accuracy, CE, MSE
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import confusion_matrix
 import seaborn as sb
+from sklearn.linear_model import SGDClassifier
 # download MNIST dataset
+
 data = datasets.load_digits()
 labels = data.target.reshape(-1,1)
 N = labels.shape[0]
@@ -40,22 +40,56 @@ scaler.fit(X_train)
 X_train = scaler.transform(X_train)
 X_test = scaler.transform(X_test)
 
+eta = np.logspace(-4,-1,4)
+penalty = np.logspace(-5,0,4)
 #set up one-hot vector
 one_hot = np.zeros((Y_train.shape[0], 10))
 for i in range(Y_train.shape[0]):
     one_hot[i,Y_train[i]] = 1
 
+#sklearn's logistic regression
+sklearn_accuracy_best = 1    #arbitrary
+sklearn_accuracy = np.zeros((len(eta),len(penalty)))
+print(X_train.shape)
+print(X_test.shape)
+
+for i in range(len(eta)):
+    for j in range(len(penalty)):
+        sklearn_logistic = SGDClassifier(loss="log", alpha = penalty[j],
+            max_iter = 300,learning_rate = "constant",eta0=eta[i])
+        sklearn_logistic.fit(X_train,np.ravel(Y_train))
+        sklearn_logistic.predict(X_test)
+        sklearn_accuracy[i][j] = sklearn_logistic.score(X_test,np.ravel(Y_test))
+        if sklearn_accuracy[i][j] > sklearn_accuracy_best:
+            sklearn_accuracy_best = accuracy
+            print(sklearn_accuracy_best)
+
+heatmap = sb.heatmap(sklearn_accuracy,cmap="viridis",
+                              xticklabels=["%.3f" %i for i in eta],
+                              yticklabels=["%.3f" %j for j in penalty],
+                              cbar_kws={'label': 'Accuracy'},
+                              fmt = ".5",
+                              annot = True)
+heatmap.set_xlabel(r"$\eta$")
+heatmap.set_ylabel(r"$\lambda$")
+heatmap.invert_yaxis()
+heatmap.set_title("Accuracy on handwritten digits")
+fig = heatmap.get_figure()
+plt.show()
+
+
+
+
 #Make neural network with zero hidden layer
-output_layer = dense_layer(features, 10, softmax())
+output_layer = DenseLayer(features, 10, softmax())
 
 layers = [output_layer]
 log_net = NN(layers)
 cost_func = CE()    #using cross-entropy as cost function
 
-epochs = 500
+epochs = 300
 mini_batch_size = N//200
-eta = np.logspace(-4,-1,4)
-penalty = np.logspace(-5,0,4)
+
 m = X_train.shape[0]
 
 ind = np.arange(0, X_train.shape[0])
@@ -70,7 +104,7 @@ for i in range(len(eta)):
             for l in range(0,m,mini_batch_size):
                 log_net.backprop2layer(cost_func, X_train[l:l+mini_batch_size],
                     one_hot[l:l+mini_batch_size], eta[i],penalty[j])
-            Y_pred = np.argmax(log_net.feed_forward(X_test), axis=1)
+            Y_pred = np.argmax(log_net.feedforward(X_test), axis=1)
             #print(Y_pred)
             #print(Y_test)
 
@@ -84,8 +118,26 @@ for i in range(len(eta)):
                 Y_pred_best = Y_pred
                 Y_test_best = Y_test
 
+#making accuracy heatmap to compare with FFNN
+
+heatmap = sb.heatmap(cost_array,cmap="viridis",
+                              xticklabels=["%.3f" %i for i in eta],
+                              yticklabels=["%.3f" %j for j in penalty],
+                              cbar_kws={'label': 'Accuracy'},
+                              fmt = ".5",
+                              annot = True)
+heatmap.set_xlabel(r"$\eta$")
+heatmap.set_ylabel(r"$\lambda$")
+heatmap.invert_yaxis()
+heatmap.set_title("Accuracy on handwritten digits")
+fig = heatmap.get_figure()
+plt.show()
 
 
+
+
+
+#creating confusion matrix
 numbers = np.arange(0,10)
 confusion_matrix = confusion_matrix(Y_pred_best,Y_test_best,normalize="true")
 heatmap = sb.heatmap(confusion_matrix,cmap="viridis",
