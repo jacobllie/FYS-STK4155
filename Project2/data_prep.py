@@ -23,7 +23,7 @@ class data_prep:
         self.D = inputs
 
 
-    def X_D(self,x,y,z,p):
+    def X_D(self, x, y, z, p):
         self.z = z
         #if the x, and y values are matrices we need to make them into vectors
         if len(x.shape)>1:
@@ -41,12 +41,12 @@ class data_prep:
         self.D = X
 
     def train_test_split_scale(self):
-        X_train,X_test,z_train,z_test = train_test_split(self.D,self.z,test_size=0.3)
+        X_train, X_test, z_train, z_test = train_test_split(self.D, self.z, test_size=0.3)
         scaler = StandardScaler()
         scaler.fit(X_train)
         X_train_scaled =  scaler.transform(X_train)
         X_test_scaled = scaler.transform(X_test)
-        if np.all(self.D[:,0] == 0):
+        if np.all(self.D[:,0] == 1):
             X_train_scaled[:,0] = 1
             X_test_scaled[:,0] = 1
         return X_train_scaled, X_test_scaled, z_train, z_test

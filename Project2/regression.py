@@ -2,13 +2,14 @@ import numpy as np
 from numpy import random
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error, r2_score
 from functions import FrankeFunction,X_D
 from sklearn.utils import resample
 import matplotlib.pyplot as plt
 from data_prep import data_prep
 import seaborn as sb
 
+plt.rcParams.update({'font.size': 12})
 
 class regression:
     def __init__(self, X_train, X_test, z_train, z_test):
@@ -21,7 +22,7 @@ class regression:
 
 
 
-    def SGD(self, epochs, mini_batch_size, t0, t1, gamma=0, lam=0):
+    def SGD(self, epochs, mini_batch_size, eta = 1e-4, t0=0, t1=1, gamma=0, lam=0):
         """
         lam != 0 represents ridge method
         """
@@ -30,9 +31,9 @@ class regression:
         self.weights = random.randn(d)
         def learning_schedule(t):
             if t0 == 0:
-                return 0.00001
+                return eta
             else:
-                return t0/(t1+t)#t0/(t1+0.000005*t)
+                return t0/(t1+t)
         MSE_array = np.ones(epochs)*np.nan
         ind = np.arange(0,m)
         v = 0
@@ -48,9 +49,10 @@ class regression:
                 eta = learning_schedule(i*m+j)
                 v = gamma*v + eta*gradient
                 self.weights = self.weights - v
-            z_pred = X_train@self.weights
-            MSE_array[i] = mean_squared_error(self.z_train, z_pred)
-        self.MSE = mean_squared_error(self.z_train, z_pred)
+            z_pred = self.X_test@self.weights
+            MSE_array[i] = mean_squared_error(self.z_test, z_pred)
+        self.MSE = mean_squared_error(self.z_test, z_pred)
+        self.r2 = r2_score(self.z_test, z_pred)
         #plt.plot(MSE_array, '.')
         #plt.xlabel("epoch")
         #plt.ylabel("MSE")
@@ -63,6 +65,7 @@ class regression:
                        .dot(self.X_train.T).dot(self.z_train)
         z_pred = self.X_test @ self.weights
         self.MSE = mean_squared_error(self.z_test, z_pred)
+        self.r2 = r2_score(self.z_test, z_pred)
 
     def ridge(self, hyp):
         I = np.identity(self.X_train.shape[1])
@@ -70,55 +73,58 @@ class regression:
                        .dot(self.X_train.T).dot(self.z_train)
         z_pred = self.X_test @ self.weights
         self.MSE = mean_squared_error(self.z_test, z_pred)
-
-
-
-
-
+        self.r2 = r2_score(self.z_test, z_pred)
 
 if __name__ == '__main__':
     np.random.seed(100)
 
     n = 100
     noise = 0.1
-    x = np.random.uniform(0,1,n)
-    y = np.random.uniform(0,1,n)
-    x,y = np.meshgrid(x,y) + noise*np.random.randn(n,n)
-    z = np.ravel(FrankeFunction(x,y))
+    x = np.random.uniform(0, 1, n)
+    y = np.random.uniform(0, 1, n)
+    X,Y = np.meshgrid(x, y) + noise*np.random.randn(n, n)
+    Z = np.ravel(FrankeFunction(X, Y))
 
-    data = data_prep(x,y,z,10)
-    X_train, X_test, z_train, z_test = data()
+    data = data_prep()
+    data.X_D(X ,Y, Z, 10)
+    X_train, X_test, z_train, z_test = data.train_test_split_scale()
     my_instance = regression(X_train, X_test, z_train, z_test)
 
     # doing SGD regression on our object
-    my_instance.SGD(epochs=200, mini_batch_size=30,
-                    t0=0, t1=1, gamma = 0.9, lam = 0)
+    my_instance.SGD(epochs=200, mini_batch_size=30, eta = 1e-3, gamma = 0.9)
     print("MSE from SGD (OLS):                  ",my_instance.MSE)
+    print("r2 score from SGD (OLS):             ",my_instance.r2, "\n")
 
     # doing OLS regression on our object
     my_instance.OLS()
-    print("MSE from OLS:                        ",my_instance.MSE, "\n")
+    print("MSE from OLS:                        ",my_instance.MSE)
+    print("r2 score from (OLS):                 ",my_instance.r2, "\n")
 
     hyp1 = 0.1
     hyp2 = 0.01
     hyp3 = 0.001
-    my_instance.SGD(epochs=200, mini_batch_size=30,
-                    t0=0, t1=1, gamma = 0.9, lam=hyp1)
-    print("MSE from SGD (Ridge, hyp=%.0e):     " % hyp1, my_instance.MSE)
+    my_instance.SGD(epochs=200, mini_batch_size=30, eta=1e-3, gamma = 0.9, lam=hyp1)
+    print("MSE from SGD (Ridge, hyp=%.0e):      " % hyp1, my_instance.MSE)
+    print("r2 score from SGD (Ridge, hyp=%.0e): " %hyp1, my_instance.r2, "\n")
     my_instance.ridge(hyp1)
-    print("MSE from Ridge (hyp=%.0e):          " % hyp1, my_instance.MSE, "\n")
+    print("MSE from Ridge (hyp=%.0e):           " % hyp1, my_instance.MSE)
+    print("r2 score from Ridge (hyp=%.0e):      " %hyp1, my_instance.r2, "\n")
 
     my_instance.SGD(epochs=200, mini_batch_size=30,
                     t0=0, t1=1, gamma = 0.9, lam=hyp2)
     print("MSE from SGD (Ridge, hyp=%.0e):     " % hyp2, my_instance.MSE)
+    print("r2 score from SGD (Ridge, hyp=%.0e):" % hyp2, my_instance.r2, "\n")
     my_instance.ridge(hyp2)
-    print("MSE from Ridge (hyp=%.0e):          " % hyp2, my_instance.MSE, "\n")
+    print("MSE from Ridge (hyp=%.0e):          " % hyp2, my_instance.MSE)
+    print("r2 score from Ridge (hyp=%.0e):     " % hyp2, my_instance.r2, "\n")
 
     my_instance.SGD(epochs=200, mini_batch_size=30,
                     t0=0, t1=1, gamma = 0.9, lam=hyp3)
     print("MSE from SGD (Ridge, hyp=%.0e):     " % hyp3, my_instance.MSE)
+    print("r2 score SGD (Ridge, hyp=%.0e):     " % hyp3, my_instance.r2, "\n")
     my_instance.ridge(hyp3)
-    print("MSE from Ridge (hyp=%.0e):          " % hyp3, my_instance.MSE, "\n")
+    print("MSE from Ridge (hyp=%.0e):          " % hyp3, my_instance.MSE)
+    print("r2 score Ridge (hyp=%.0e):          " % hyp3, my_instance.r2, "\n")
 
 
 
@@ -126,7 +132,7 @@ if __name__ == '__main__':
     Making a heatmap of MSE with SGD as function of epochs and mini batch size.
     Learning rate is constant.
     """
-    create_heatmap_MSE = False
+    create_heatmap_MSE = True
     if create_heatmap_MSE == True:
         epochs = np.linspace(20, 300, 15).astype("int")
         mb_sizes = np.linspace(5, 25, 5).astype("int")
@@ -166,7 +172,7 @@ if __name__ == '__main__':
         heatmap.invert_yaxis()
         heatmap.set_title("Heatmap of MSE using SGD (OLS)")
         fig = heatmap.get_figure()
-        fig.savefig("./figures/SGD_MSE_heatmap_OLS.jpg", bbox_inches='tight',
+        fig.savefig("./figures/SGD_MSE_heatmap_OLS.pdf", bbox_inches='tight',
                                                     pad_inches=0.1, dpi=1200)
         plt.figure("Ridge1")
         heatmap_r = sb.heatmap(MSE_SGD_r1, annot=True,cmap="viridis_r",
@@ -180,7 +186,7 @@ if __name__ == '__main__':
         heatmap_r.invert_yaxis()
         heatmap_r.set_title("Heatmap of MSE using SGD (Ridge, $\lambda$=%s)" % hyp1)
         fig = heatmap_r.get_figure()
-        fig.savefig("./figures/SGD_MSE_heatmap_ridge_%s.jpg"
+        fig.savefig("./figures/SGD_MSE_heatmap_ridge_%s.pdf"
                                  % hyp1,bbox_inches='tight',
                                  pad_inches=0.1,
                                  dpi=1200)
@@ -196,7 +202,7 @@ if __name__ == '__main__':
         heatmap_r.invert_yaxis()
         heatmap_r.set_title("Heatmap of MSE using SGD (Ridge, $\lambda$=%s)" % hyp2)
         fig = heatmap_r.get_figure()
-        fig.savefig("./figures/SGD_MSE_heatmap_ridge_%s.jpg"
+        fig.savefig("./figures/SGD_MSE_heatmap_ridge_%s.pdf"
                                   % hyp2,bbox_inches='tight',
                                   pad_inches=0.1,
                                   dpi=1200)
@@ -212,7 +218,7 @@ if __name__ == '__main__':
         heatmap_r.invert_yaxis()
         heatmap_r.set_title("Heatmap of MSE using SGD (Ridge, $\lambda$=%s)" % hyp3)
         fig = heatmap_r.get_figure()
-        fig.savefig("./figures/SGD_MSE_heatmap_ridge_%s.jpg"
+        fig.savefig("./figures/SGD_MSE_heatmap_ridge_%s.pdf"
                                   % hyp3,bbox_inches='tight',
                                   pad_inches=0.1,
                                   dpi=1200)
@@ -224,7 +230,7 @@ if __name__ == '__main__':
     Using the optimal values for epochs and mini batch size from the heatmap to
     estimate the optimal learning rate based on t0 and t1.
     """
-    create_heatmap_lr = False
+    create_heatmap_lr = True
     if create_heatmap_lr == True:
         # the number of epochs highly affects the computation time
         epoch = 60                 # estimated best value from OLS heatmap above
@@ -286,7 +292,7 @@ if __name__ == '__main__':
                                                              % (epoch,mbs))
         fig = heatmap.get_figure()
         plt.yticks(rotation=0)
-        fig.savefig("./figures/Learning_rate_MSE_heatmap_OLS.jpg",
+        fig.savefig("./figures/Learning_rate_MSE_heatmap_OLS.pdf",
                                               bbox_inches='tight',
                                               pad_inches=0.1,
                                               dpi=1200)
@@ -300,11 +306,11 @@ if __name__ == '__main__':
         heatmap_r.set_xlabel("t1")
         heatmap_r.set_ylabel("t0")
         heatmap_r.invert_yaxis()
-        heatmap_r.set_title("MSE of learning rates (Ridge, $\lambda$=%s, \
-                             epoch=%i, batch=%i)" % (hyp1,epoch_r1,mbs_r1))
+        heatmap_r.set_title("MSE of learning rates (Ridge, $\lambda$=%s, epoch=%i, batch=%i)"
+            % (hyp1,epoch_r1,mbs_r1))
         fig = heatmap_r.get_figure()
         plt.yticks(rotation=0)
-        fig.savefig("./figures/Learning_rate_MSE_heatmap_ridge_%s.jpg" % hyp1,
+        fig.savefig("./figures/Learning_rate_MSE_heatmap_ridge_%s.pdf" % hyp1,
                                                           bbox_inches='tight',
                                                           pad_inches=0.1,
                                                           dpi=1200)
@@ -318,11 +324,11 @@ if __name__ == '__main__':
         heatmap_r.set_xlabel("t1")
         heatmap_r.set_ylabel("t0")
         heatmap_r.invert_yaxis()
-        heatmap_r.set_title("MSE of learning rates (Ridge, $\lambda$=%s, \
-                             epoch=%i, batch=%i)" % (hyp2,epoch_r2,mbs_r2))
+        heatmap_r.set_title("MSE of learning rates (Ridge, $\lambda$=%s,epoch=%i,batch=%i)"
+            % (hyp2,epoch_r2,mbs_r2))
         fig = heatmap_r.get_figure()
         plt.yticks(rotation=0)
-        fig.savefig("./figures/Learning_rate_MSE_heatmap_ridge_%s.jpg" % hyp2,
+        fig.savefig("./figures/Learning_rate_MSE_heatmap_ridge_%s.pdf" % hyp2,
                                                           bbox_inches='tight',
                                                           pad_inches=0.1,
                                                           dpi=1200)
@@ -336,11 +342,11 @@ if __name__ == '__main__':
         heatmap_r.set_xlabel("t1")
         heatmap_r.set_ylabel("t0")
         heatmap_r.invert_yaxis()
-        heatmap_r.set_title("MSE of learning rates (Ridge, $\lambda$=%s, \
-                             epoch=%i, batch=%i)" % (hyp3,epoch_r3,mbs_r3))
+        heatmap_r.set_title("MSE of learning rates (Ridge, $\lambda$=%s, epoch=%i, batch=%i)"
+            % (hyp3,epoch_r3,mbs_r3))
         fig = heatmap_r.get_figure()
         plt.yticks(rotation=0)
-        fig.savefig("./figures/Learning_rate_MSE_heatmap_ridge_%s.jpg" % hyp3,
+        fig.savefig("./figures/Learning_rate_MSE_heatmap_ridge_%s.pdf" % hyp3,
                                                           bbox_inches='tight',
                                                           pad_inches=0.1,
                                                           dpi=1200)
