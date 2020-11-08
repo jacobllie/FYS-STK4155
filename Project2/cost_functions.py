@@ -25,9 +25,10 @@ class CE:
     """
     Log cross-entropy cost function.
     """
-    def __call__(self, y, a):
-        #return -np.sum(y*np.log(P(a)) + (1-y)*np.log(1 - np.log(P(a))))
-        return -np.sum(a*(1-y) - np.log(1 + np.exp(-a)))
+    def __call__(self,y,a):
+        tmp1 = np.pow(a,y)
+        tmp2 = np.prod(tmp1)
+        return -np.log(tmp2)
 
-    def deriv(self, y, a):
-        return -(y - 1 + 1/(1 + np.exp(a)))
+    def deriv(self,y,a):
+        return a-y
