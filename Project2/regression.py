@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import random
+import sys
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, r2_score
@@ -53,12 +54,6 @@ class regression:
             MSE_array[i] = mean_squared_error(self.z_test, z_pred)
         self.MSE = mean_squared_error(self.z_test, z_pred)
         self.r2 = r2_score(self.z_test, z_pred)
-        #plt.plot(MSE_array, '.')
-        #plt.xlabel("epoch")
-        #plt.ylabel("MSE")
-        #plt.show()
-        #print(z_pred)
-        #print(self.z_train)
 
     def OLS(self):
         self.weights = np.linalg.pinv(self.X_train.T.dot(self.X_train))\
@@ -76,6 +71,26 @@ class regression:
         self.r2 = r2_score(self.z_test, z_pred)
 
 if __name__ == '__main__':
+
+    create_heatmap_MSE = input("Analyse minibatches vs epochs [Y/n]: ")
+    if create_heatmap_MSE == "Y" or create_heatmap_MSE == "y":
+        create_heatmap_MSE = True
+    elif create_heatmap_MSE == "N" or create_heatmap_MSE == "n":
+        create_heatmap_MSE = False
+    else:
+        print("Please input Y or n!")
+        sys.exit()
+
+    create_heatmap_lr = input("Analyse learning schedule [Y/n]: ")
+    if create_heatmap_lr == "Y" or  create_heatmap_lr == "y":
+        create_heatmap_lr = True
+    elif create_heatmap_lr == "N" or create_heatmap_lr == "n":
+        create_heatmap_lr = False
+    else:
+        print("Please input Y or n!")
+        sys.exit()
+
+
     np.random.seed(100)
 
     n = 100
@@ -132,7 +147,6 @@ if __name__ == '__main__':
     Making a heatmap of MSE with SGD as function of epochs and mini batch size.
     Learning rate is constant.
     """
-    create_heatmap_MSE = True
     if create_heatmap_MSE == True:
         epochs = np.linspace(20, 300, 15).astype("int")
         mb_sizes = np.linspace(5, 25, 5).astype("int")
@@ -166,7 +180,7 @@ if __name__ == '__main__':
                                       xticklabels=mb_sizes,
                                       yticklabels=epochs,
                                       cbar_kws={'label': 'Mean squared error'},
-                                      fmt = ".5")
+                                      fmt = ".3")
         heatmap.set_xlabel("Mini batch size")
         heatmap.set_ylabel("Epochs")
         heatmap.invert_yaxis()
@@ -180,7 +194,7 @@ if __name__ == '__main__':
                                            yticklabels=epochs,
                                            cbar_kws={'label':
                                            'Mean squared error'},
-                                           fmt = ".5")
+                                           fmt = ".3")
         heatmap_r.set_xlabel("Mini batch size")
         heatmap_r.set_ylabel("Epochs")
         heatmap_r.invert_yaxis()
@@ -196,7 +210,7 @@ if __name__ == '__main__':
                                            xticklabels=mb_sizes,
                                            yticklabels=epochs,
                                            cbar_kws={'label': 'Mean squared error'},
-                                           fmt = ".5")
+                                           fmt = ".3")
         heatmap_r.set_xlabel("Mini batch size")
         heatmap_r.set_ylabel("Epochs")
         heatmap_r.invert_yaxis()
@@ -212,7 +226,7 @@ if __name__ == '__main__':
                                            xticklabels=mb_sizes,
                                            yticklabels=epochs,
                                            cbar_kws={'label': 'Mean squared error'},
-                                           fmt = ".5")
+                                           fmt = ".3")
         heatmap_r.set_xlabel("Mini batch size")
         heatmap_r.set_ylabel("Epochs")
         heatmap_r.invert_yaxis()
@@ -230,20 +244,19 @@ if __name__ == '__main__':
     Using the optimal values for epochs and mini batch size from the heatmap to
     estimate the optimal learning rate based on t0 and t1.
     """
-    create_heatmap_lr = True
     if create_heatmap_lr == True:
         # the number of epochs highly affects the computation time
-        epoch = 60                 # estimated best value from OLS heatmap above
+        epoch = 200                # estimated best value from OLS heatmap above
         mbs = 5                    # estimated best value from OLS heatmap above
-        epoch_r1 = 60              # estimated best value from Ridge heatmap above
-        epoch_r2 = 120             # estimated best value from Ridge heatmap above
-        epoch_r3 = 100             # estimated best value from Ridge heatmap above
+        epoch_r1 = 200              # estimated best value from Ridge heatmap above
+        epoch_r2 = 5             # estimated best value from Ridge heatmap above
+        epoch_r3 = 5             # estimated best value from Ridge heatmap above
         mbs_r1 = 5                 # estimated best value from Ridge heatmap above
         mbs_r2 = 5                 # estimated best value from Ridge heatmap above
         mbs_r3 = 5                 # estimated best value from Ridge heatmap above
 
-        t0s = np.linspace(2, 10, 5).astype("int")
-        t1s = np.linspace(5000, 50000, 11).astype("int")
+        t0s = np.linspace(5, 20, 5).astype("int")
+        t1s = np.linspace(15000, 50000, 8).astype("int")
 
         MSE_lr = np.zeros((len(t1s), len(t0s)))
         MSE_lr_r1 = np.zeros((len(t1s), len(t0s)))
@@ -255,7 +268,7 @@ if __name__ == '__main__':
                                  t0=t0, t1=t1, gamma=0.9, lam=0)
                  MSE_lr[j,i] = my_instance.MSE
 
-                 my_instance.SGD(epochs=epoch_r1, mini_batch_size=mbs_r1,
+                 my_instance.SGD(epochs=epoch, mini_batch_size=mbs_r1,
                                  t0=t0, t1=t1, gamma=0.9, lam=hyp1)
                  MSE_lr_r1[j,i] = my_instance.MSE
 
@@ -284,7 +297,7 @@ if __name__ == '__main__':
                                      xticklabels=t0s,
                                      yticklabels=t1s,
                                      cbar_kws={'label': 'Mean squared error'},
-                                     fmt = ".4")
+                                     fmt = ".3")
         heatmap.set_xlabel("t1")
         heatmap.set_ylabel("t0")
         heatmap.invert_yaxis()
@@ -302,7 +315,7 @@ if __name__ == '__main__':
                                           xticklabels=t0s,
                                           yticklabels=t1s,
                                           cbar_kws={'label': 'Mean squared error'},
-                                          fmt = ".4")
+                                          fmt = ".3")
         heatmap_r.set_xlabel("t1")
         heatmap_r.set_ylabel("t0")
         heatmap_r.invert_yaxis()
@@ -320,7 +333,7 @@ if __name__ == '__main__':
                                           xticklabels=t0s,
                                           yticklabels=t1s,
                                           cbar_kws={'label': 'Mean squared error'},
-                                          fmt = ".4")
+                                          fmt = ".3")
         heatmap_r.set_xlabel("t1")
         heatmap_r.set_ylabel("t0")
         heatmap_r.invert_yaxis()
