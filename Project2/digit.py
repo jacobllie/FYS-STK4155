@@ -1,15 +1,19 @@
 import numpy as np
 from numpy import random
-import seaborn as sb
 import matplotlib.pyplot as plt
+import seaborn as sb
 from sklearn import datasets
-from activation_function import sigmoid,softmax,identity
+import sys
+from sklearn.metrics import confusion_matrix
+import time
+
+from activation_function import sigmoid, softmax, identity, tanh, relu
 from functions import FrankeFunction
 from data_prep import data_prep
-from NN import dense_layer, NN
-from cost_functions import accuracy, MSE
+from NN import DenseLayer, NN
+from cost_functions import accuracy, MSE, CE
 
-plt.rcParams.update({'font.size': 14})
+#plt.rcParams.update({'font.size': 14})
 
 # download MNIST dataset
 data = datasets.load_digits()
@@ -36,60 +40,95 @@ one_hot = np.zeros((Y_train.shape[0], 10))
 for i in range(Y_train.shape[0]):
     one_hot[i,Y_train[i]] = 1
 
-layer1 = dense_layer(features, 100, sigmoid())
-layer2 = dense_layer(100, 20, sigmoid())
-layer3 = dense_layer(80, 50, sigmoid())
-layer4 = dense_layer(50, 20, sigmoid())
-layer5 = dense_layer(20, 10, softmax())
-
-
-layers = [layer1, layer2, layer5]
 mse = MSE()
+ce = CE()
 m = X_train.shape[0]
 batch = np.arange(0,m)
 
-def epoch(eta, penalty, epochs=200, mini_batch_size = 100):
+def epoch(eta=0.04, penalty=0.4, epochs=200, mini_batch_size = 100, t0=5, t1=50,
+        create_conf=False):
+    layer1 = DenseLayer(features, 100, sigmoid())
+    #layer2 = DenseLayer(100, 50, sigmoid())
+    #layer3 = DenseLayer(100, 50, sigmoid())
+    layer4 = DenseLayer(100, 10, softmax())
+
+    layers = [layer1, layer4]
     network = NN(layers)
     cost_array = np.zeros((epochs,2))
+    def learning_schedule(t):
+        return 0.04#t0/(t+t1)
     for i in range(epochs):
         random.shuffle(batch)
         X_train_shuffle = X_train[batch]
         one_hot_shuffle = one_hot[batch]
         Y_train_shuffle = Y_train[batch]
-        for j in range(0, m, mini_batch_size):
-            network.backprop(mse, X_train_shuffle[j:j+mini_batch_size],
-                one_hot_shuffle[j:j+mini_batch_size], eta, penalty)
-        Y_pred = np.argmax(network.feed_forward(X_test), axis=1)
-        Y_pred_train = np.argmax(network.feed_forward(X_train_shuffle), axis=1)
+        #eta = learning_schedule(i)
+        network.SGD(ce, 100, X_train_shuffle, one_hot_shuffle, eta, penalty)
+        Y_pred = np.argmax(network.feedforward(X_test), axis=1)
+        Y_pred_train = np.argmax(network.feedforward(X_train_shuffle), axis=1)
         cost_array[i,0] = accuracy()(Y_test.ravel(), Y_pred)
         cost_array[i,1] = accuracy()(Y_train_shuffle.ravel(), Y_pred_train)
-    """plt.plot(cost_array[:,1], label="Train")
-    plt.plot(cost_array[:,0], label="Test")
-    plt.xlabel("Epochs")
-    plt.ylabel("Accuracy")
-    plt.legend()
-    plt.show()"""
     print("accuracy on train data = %.3f" %cost_array[-1, 1])
     print("accuracy on test data = %.3f" %cost_array[-1, 0])
+    if create_conf == True:
+        #creating confusion matrix
+        numbers = np.arange(0,10)
+        conf_matrix = confusion_matrix(Y_pred,Y_test,normalize="true")
+        heatmap = sb.heatmap(conf_matrix,cmap="viridis",
+                              xticklabels=["%d" %i for i in numbers],
+                              yticklabels=["%d" %i for i in numbers],
+                              cbar_kws={'label': 'Accuracy'},
+                              fmt = ".2",
+                              edgecolor="none",
+                              annot = True)
+        heatmap.set_xlabel("pred")
+        heatmap.set_ylabel("true")
+
+        heatmap.set_title(r"FFNN prediction accuracy with $\lambda$ = {:.1e} $\eta$ = {:.1e}"\
+            .format(penalty, eta))
+        fig = heatmap.get_figure()
+        fig.savefig("figures/MNIST_confusion_net.pdf",bbox_inches='tight',
+                                  pad_inches=0.1,
+                                  dpi = 1200)
+        plt.show()
     return cost_array[-1]
 
-penalties = np.logspace(-2,0,11)
-etas = np.logspace(-3,-1,11)
-accuracy_map = np.zeros((len(penalties), len(etas), 2))
+create_heatmap = input("Analyse penalty parameter and learning rate [Y/n]: ")
+if create_heatmap == "Y" or create_heatmap == "y":
+    create_heatmap = True
+elif create_heatmap == "N" or create_heatmap == "n":
+    create_heatmap = False
+else:
+    print("Please input Y or n!")
+    sys.exit()
 
-for i, penalty in enumerate(penalties):
-    for k, eta in enumerate(etas):
-        accuracy_map[k, i] = epoch(eta, penalty)
+if create_heatmap == True:
+    #Make an accuracy map for different etas and lambdas
+    penalties = [0.001, 0.01, 0.05, 0.1, 0.5, 1]
+    etas = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5]
+    accuracy_map = np.zeros((len(penalties), len(etas), 2))
 
-np.save("accuracy_map.npy", accuracy_map)
+    start_time = time.time()
+    for i, penalty in enumerate(penalties):
+        for k, eta in enumerate(etas):
+            print("-----------------------------")
+            accuracy_map[i, k] = epoch(eta, penalty)
+    print("--- %s seconds ---" % (time.time() - start_time))
 
-def plot_pictures(k):
-    #k determines which pictures to plot
-    # choose some random images to display
-    for i in range(5):
-        plt.subplot(1, 5, i+1)
-        plt.axis('off')
-        plt.imshow(data.images[ind][i+k], cmap=plt.cm.gray_r, interpolation='nearest')
-        plt.title("Label: %d" %data.target[ind][i+k])
-        plt.text(1, -4, "Pred: %d" %Y_pred[i+k], fontsize=16)
+    heatmap = sb.heatmap(accuracy_map[:,:,0],cmap="viridis",
+                                  xticklabels=etas,
+                                  yticklabels=penalties,
+                                  cbar_kws={'label': 'Accuracy'},
+                                  fmt = ".3",
+                                  annot = True)
+    plt.yticks(rotation=0)
+    heatmap.set_xlabel(r"$\eta$")
+    heatmap.set_ylabel(r"$\lambda$")
+    heatmap.invert_yaxis()
+    heatmap.set_title("Accuracy on MNIST with FFNN")
+    fig = heatmap.get_figure()
     plt.show()
+    fig.savefig("./figures/MNIST_heatmap_CE.pdf", bbox_inches='tight',
+                                                pad_inches=0.1)
+
+epoch(eta=0.1, penalty=1, epochs=200, create_conf=True)

@@ -16,16 +16,9 @@ class tanh:
 
 class relu:
     def __call__(self,z):
-        z = np.array(z)
-        z_neg = np.where(z < 0)
-        z[z_neg] = 0
-        return z
+        return z*(z > 0)
     def deriv(self,z):
-        z = np.array(z)
-        z_neg = np.where(z < 0)
-        z[:] = 1
-        z[z_neg] = 0
-        return z
+        return 1*(z > 0)
 
 class leaky_relu:
     def __call__(self, z, alpha=0.1):
