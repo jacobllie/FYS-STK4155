@@ -13,8 +13,9 @@ np.random.seed(80)
 
 class DenseLayer:
     def __init__(self, inputs, outputs, act_func):
-        self.weights = random.randn(inputs, outputs)
-        self.b = random.randn(1, outputs)
+        #Here we can try with different inializations
+        self.weights = random.rand(inputs, outputs)
+        self.b = random.rand(1, outputs)
         self.act_func = act_func
 
     def __call__(self, X):
@@ -82,11 +83,11 @@ if __name__ == "__main__":
         print("Please input Y or n!")
         sys.exit()
 
-    network = input("Analyse learning rate vs penalty parameter [Y/n]: ")
-    if network == "Y" or network == "y":
-        network = True
-    elif network == "N" or network == "n":
-        network = False
+    franke_lambda = input("Analyse learning rate vs penalty parameter [Y/n]: ")
+    if franke_lambda == "Y" or franke_lambda == "y":
+        franke_lambda = True
+    elif franke_lambda == "N" or franke_lambda == "n":
+        franke_lambda = False
     else:
         print("Please input Y or n!")
         sys.exit()
@@ -171,9 +172,13 @@ if __name__ == "__main__":
     etas = [0.001, 0.01, 0.05, 0.1, 0.5, 1]
     epochs = [50, 100, 200, 400, 800, 1000]
 
+    p_len = len(penalties)
+    e_len = len(etas)
+    ep_len = len(epochs)
+
     ind = np.arange(0,len(x_train))
-    if network == True:
-        MSE_network = np.zeros((len(penalties), len(etas), 2))      # 2 so we can use plot_acc.py
+    if franke_lambda == True:
+        MSE_network = np.zeros((p_len, e_len, 2))      # 2 so we can use plot_acc.py
         for i, penalty in enumerate(penalties):
             for j, eta in enumerate(etas):
                 #Setting up network
@@ -182,7 +187,6 @@ if __name__ == "__main__":
                 layer3 = DenseLayer(n_neurons_layer2, 1, identity())
                 layers = [layer1, layer2, layer3]
                 network = NN(layers)
-                print(i, j)
                 # Back-propagation
                 for k in range(100):
                     random.shuffle(ind)
@@ -191,12 +195,14 @@ if __name__ == "__main__":
                     network.SGD(100, x_train_shuffle, y_train_shuffle, eta, penalty)
                 MSE_network[i,j,0] = mse(y_test, network.feedforward(x_test))
                 MSE_network[i,j,1] = mse(y_train_shuffle, network.feedforward(x_train_shuffle))
+                progress = int(100*(p_len*(i+1) + (j+1))/(p_len*p_len + e_len))
+                print(f"\r Progress: {progress}%", end = "\r")
 
         plt.figure("FFNN")
         heatmap = sb.heatmap(MSE_network[:,:,0],cmap="viridis_r",
                                       yticklabels=["%.3f" %i for i in penalties],
                                       xticklabels=["%.4f" %j for j in etas],
-                                      cbar_kws={'label': 'Accuracy'},
+                                      cbar_kws={'label': 'MSE'},
                                       fmt = ".3",
                                       annot = True)
         plt.yticks(rotation=0)
@@ -210,7 +216,7 @@ if __name__ == "__main__":
                                                     pad_inches=0.1)
 
     if franke_epoch == True:
-        MSE_epoch = np.zeros((len(etas), len(epochs)))      # 2 so we can use plot_acc.py
+        MSE_epoch = np.zeros((e_len, ep_len))      # 2 so we can use plot_acc.py
         for i, eta in enumerate(etas):
             for j, epoch in enumerate(epochs):
                 #Setting up network
@@ -219,7 +225,6 @@ if __name__ == "__main__":
                 layer3 = DenseLayer(n_neurons_layer2, 1, identity())
                 layers = [layer1, layer2, layer3]
                 network = NN(layers)
-                print(i, j)
                 # Back-propagation
                 for k in range(epoch):
                     random.shuffle(ind)
@@ -227,6 +232,8 @@ if __name__ == "__main__":
                     y_train_shuffle = y_train[ind]
                     network.SGD(100, x_train_shuffle, y_train_shuffle, eta, penalty=0)
                 MSE_epoch[j,i] = mse(y_test, network.feedforward(x_test))
+                progress = int(100*(e_len*(i+1) + (j+1))/(e_len*e_len + ep_len))
+                print(f"\r Progress: {progress}%", end = "\r")
 
         plt.figure("EPOCH")
         heatmap = sb.heatmap(MSE_epoch,cmap="viridis_r",
@@ -242,7 +249,7 @@ if __name__ == "__main__":
         heatmap.set_title("MSE on Franke dataset with FFNN")
         fig = heatmap.get_figure()
         plt.show()
-        fig.savefig("./figures/Franke_FFNN_epoch.pdf", bbox_inches='tight',
+        fig.savefig("./figures/Franke_FFNN_weights.pdf", bbox_inches='tight',
                                                     pad_inches=0.1)
 
     def create_neural_network_keras(n_neurons_layer1, n_neurons_layer2, n_categories, eta, penalty=0):
@@ -260,17 +267,19 @@ if __name__ == "__main__":
         MSE_Keras = np.zeros((len(etas), len(penalties)))      # 2 so we can use plot_acc.py
         for i in range(len(etas)):
             for j in range(len(penalties)):
-                DNN = create_neural_network_keras(n_neurons_layer1, n_neurons_layer2, n_categories,eta=etas[i],penalty = penalties[j])
+                DNN = create_neural_network_keras(n_neurons_layer1, n_neurons_layer2,
+                    n_categories,eta=etas[i],penalty = penalties[j])
                 DNN.fit(x_train, y_train, epochs=100, batch_size=100, verbose=0)
                 MSE_Keras[j,i] = DNN.evaluate(x_test, test_output)
-                print(i,j)
+                progress = int(100*(e_len*(i+1) + (j+1))/(e_len*e_len + p_len))
+                print(f"\r Progress: {progress}%", end = "\r")
 
 
         plt.figure("Keras")
         heatmap = sb.heatmap(MSE_Keras,cmap="viridis_r",
                                       yticklabels=["%.3f" %i for i in penalties],
                                       xticklabels=["%.4f" %j for j in etas],
-                                      cbar_kws={'label': 'Accuracy'},
+                                      cbar_kws={'label': 'MSE'},
                                       fmt = ".3",
                                       annot = True,
                                       vmax=0.17)
@@ -294,7 +303,6 @@ if __name__ == "__main__":
             for j, epoch in enumerate(epochs):
                 #Setting up network
                 network = NN(layers)
-                print(i, j)
                 # Back-propagation
                 for k in range(epoch):
                     random.shuffle(ind)
@@ -302,8 +310,10 @@ if __name__ == "__main__":
                     y_train_shuffle = y_train[ind]
                     network.SGD(100, x_train_shuffle, y_train_shuffle, eta, penalty=0)
                 MSE_relu[j,i] = mse(y_test, network.feedforward(x_test))
+                progress = int(100*(e_len*(i+1) + (j+1))/(e_len*e_len + ep_len))
+                print(f"\r Progress: {progress}%", end = "\r")
 
-        plt.figure("EPOCH")
+        plt.figure("relu")
         heatmap = sb.heatmap(MSE_relu,cmap="viridis_r",
                                       yticklabels=["%d" %i for i in epochs],
                                       xticklabels=["%.4f" %j for j in etas],
