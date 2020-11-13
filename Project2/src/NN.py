@@ -9,10 +9,9 @@ from data_prep import data_prep
 from functions import FrankeFunction
 from cost_functions import MSE
 
-np.random.seed(200)
-
 class DenseLayer:
     def __init__(self, inputs, outputs, act_func):
+        np.random.seed(200)
         #Here we can try with different inializations
         self.weights = random.randn(inputs, outputs)
         self.b = random.randn(1, outputs)
@@ -53,7 +52,7 @@ class NN:
             - eta*penalty*L[0].weights/len(y)
         L[0].b = L[0].b - eta*delta_l[0, :]
 
-    def backprop2layer(self, cost, x, y, eta):
+    def backprop2layer(self, cost, x, y, eta, penalty=0):
         self.feedforward(x)  #using the updated weights and biases to get new output layer
         #Starting with output layer
         L = self.layers
@@ -212,7 +211,7 @@ if __name__ == "__main__":
         heatmap.invert_yaxis()
         heatmap.set_title("MSE on Franke dataset with FFNN")
         fig = heatmap.get_figure()
-        fig.savefig("./figures/Franke_FFNN.pdf", bbox_inches='tight',
+        fig.savefig("../figures/Franke_FFNN.pdf", bbox_inches='tight',
                                                     pad_inches=0.1)
         plt.show()
 
@@ -252,7 +251,7 @@ if __name__ == "__main__":
         heatmap.set_title("MSE on Franke dataset with FFNN")
         fig = heatmap.get_figure()
         plt.show()
-        fig.savefig("./figures/Franke_FFNN_epoch.pdf", bbox_inches='tight',
+        fig.savefig("../figures/Franke_FFNN_epoch.pdf", bbox_inches='tight',
                                                     pad_inches=0.1)
 
     def create_neural_network_keras(n_neurons_layer1, n_neurons_layer2, n_categories, eta, penalty=0):
@@ -293,7 +292,7 @@ if __name__ == "__main__":
         heatmap.set_title("MSE on Franke dataset with Keras")
         fig = heatmap.get_figure()
         plt.show()
-        fig.savefig("./figures/Franke_Keras.pdf", bbox_inches='tight',
+        fig.savefig("../figures/Franke_Keras.pdf", bbox_inches='tight',
                                                     pad_inches=0.1)
 
     if franke_relu == True:
@@ -330,6 +329,6 @@ if __name__ == "__main__":
         heatmap.invert_yaxis()
         heatmap.set_title("MSE on Franke dataset with FFNN using relu")
         fig = heatmap.get_figure()
-        fig.savefig("./figures/Franke_FFNN_relu.pdf", bbox_inches='tight',
+        fig.savefig("../figures/Franke_FFNN_relu.pdf", bbox_inches='tight',
                                                     pad_inches=0.1)
         plt.show()

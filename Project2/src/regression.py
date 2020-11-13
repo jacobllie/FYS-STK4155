@@ -186,7 +186,7 @@ if __name__ == '__main__':
         heatmap.invert_yaxis()
         heatmap.set_title("Heatmap of MSE using SGD (OLS)")
         fig = heatmap.get_figure()
-        fig.savefig("./figures/SGD_MSE_heatmap_OLS.pdf", bbox_inches='tight',
+        fig.savefig("../figures/SGD_MSE_heatmap_OLS.pdf", bbox_inches='tight',
                                                     pad_inches=0.1, dpi=1200)
         plt.figure("Ridge1")
         heatmap_r = sb.heatmap(MSE_SGD_r1, annot=True,cmap="viridis_r",
@@ -200,7 +200,7 @@ if __name__ == '__main__':
         heatmap_r.invert_yaxis()
         heatmap_r.set_title("Heatmap of MSE using SGD (Ridge, $\lambda$=%s)" % hyp1)
         fig = heatmap_r.get_figure()
-        fig.savefig("./figures/SGD_MSE_heatmap_ridge_%s.pdf"
+        fig.savefig("../figures/SGD_MSE_heatmap_ridge_%s.pdf"
                                  % hyp1,bbox_inches='tight',
                                  pad_inches=0.1,
                                  dpi=1200)
@@ -216,7 +216,7 @@ if __name__ == '__main__':
         heatmap_r.invert_yaxis()
         heatmap_r.set_title("Heatmap of MSE using SGD (Ridge, $\lambda$=%s)" % hyp2)
         fig = heatmap_r.get_figure()
-        fig.savefig("./figures/SGD_MSE_heatmap_ridge_%s.pdf"
+        fig.savefig("../figures/SGD_MSE_heatmap_ridge_%s.pdf"
                                   % hyp2,bbox_inches='tight',
                                   pad_inches=0.1,
                                   dpi=1200)
@@ -232,7 +232,7 @@ if __name__ == '__main__':
         heatmap_r.invert_yaxis()
         heatmap_r.set_title("Heatmap of MSE using SGD (Ridge, $\lambda$=%s)" % hyp3)
         fig = heatmap_r.get_figure()
-        fig.savefig("./figures/SGD_MSE_heatmap_ridge_%s.pdf"
+        fig.savefig("../figures/SGD_MSE_heatmap_ridge_%s.pdf"
                                   % hyp3,bbox_inches='tight',
                                   pad_inches=0.1,
                                   dpi=1200)
@@ -305,7 +305,7 @@ if __name__ == '__main__':
                                                              % (epoch,mbs))
         fig = heatmap.get_figure()
         plt.yticks(rotation=0)
-        fig.savefig("./figures/Learning_rate_MSE_heatmap_OLS.pdf",
+        fig.savefig("../figures/Learning_rate_MSE_heatmap_OLS.pdf",
                                               bbox_inches='tight',
                                               pad_inches=0.1,
                                               dpi=1200)
@@ -323,7 +323,7 @@ if __name__ == '__main__':
             % (hyp1,epoch_r1,mbs_r1))
         fig = heatmap_r.get_figure()
         plt.yticks(rotation=0)
-        fig.savefig("./figures/Learning_rate_MSE_heatmap_ridge_%s.pdf" % hyp1,
+        fig.savefig("../figures/Learning_rate_MSE_heatmap_ridge_%s.pdf" % hyp1,
                                                           bbox_inches='tight',
                                                           pad_inches=0.1,
                                                           dpi=1200)
@@ -341,7 +341,7 @@ if __name__ == '__main__':
             % (hyp2,epoch_r2,mbs_r2))
         fig = heatmap_r.get_figure()
         plt.yticks(rotation=0)
-        fig.savefig("./figures/Learning_rate_MSE_heatmap_ridge_%s.pdf" % hyp2,
+        fig.savefig("../figures/Learning_rate_MSE_heatmap_ridge_%s.pdf" % hyp2,
                                                           bbox_inches='tight',
                                                           pad_inches=0.1,
                                                           dpi=1200)
@@ -359,7 +359,7 @@ if __name__ == '__main__':
             % (hyp3,epoch_r3,mbs_r3))
         fig = heatmap_r.get_figure()
         plt.yticks(rotation=0)
-        fig.savefig("./figures/Learning_rate_MSE_heatmap_ridge_%s.pdf" % hyp3,
+        fig.savefig("../figures/Learning_rate_MSE_heatmap_ridge_%s.pdf" % hyp3,
                                                           bbox_inches='tight',
                                                           pad_inches=0.1,
                                                           dpi=1200)

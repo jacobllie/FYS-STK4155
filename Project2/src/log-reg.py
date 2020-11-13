@@ -77,7 +77,7 @@ heatmap.invert_yaxis()
 heatmap.set_title("Accuracy on MNIST with sklearn SGDClassifier")
 fig = heatmap.get_figure()
 plt.yticks(rotation=0)
-fig.savefig("sklearn_accuracy_logreg.pdf",bbox_inches='tight',
+fig.savefig("../figures/sklearn_accuracy_logreg.pdf",bbox_inches='tight',
                                   pad_inches=0.1,
                                   dpi = 1200)
 
@@ -140,7 +140,7 @@ heatmap.invert_yaxis()
 heatmap.set_title("Accuracy on MNIST FFNN logreg")
 fig = heatmap.get_figure()
 plt.yticks(rotation=0)
-fig.savefig("FFNN_accuracy_logreg.pdf",bbox_inches='tight',
+fig.savefig("../figures/FFNN_accuracy_logreg.pdf",bbox_inches='tight',
                                   pad_inches=0.1,
                                   dpi = 1200)
 
@@ -167,7 +167,7 @@ heatmap.set_title(r"MNIST prediction accuracy with $\lambda$ = {:.1e} $\eta$ = {
         .format(penalty_best,eta_best))
 fig = heatmap.get_figure()
 plt.yticks(rotation=0)
-fig.savefig("MNIST_confusion.pdf",bbox_inches='tight',
+fig.savefig("../figures/MNIST_confusion.pdf",bbox_inches='tight',
                                   pad_inches=0.1,
                                   dpi = 1200)
 

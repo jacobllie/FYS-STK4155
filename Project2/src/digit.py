@@ -87,7 +87,7 @@ def epoch(eta=0.04, penalty=0.4, epochs=200, mini_batch_size = 100, t0=5, t1=50,
         heatmap.set_title(r"FFNN prediction accuracy with $\lambda$ = {:.1e} $\eta$ = {:.1e}"\
             .format(penalty, eta))
         fig = heatmap.get_figure()
-        fig.savefig("figures/MNIST_confusion_net.pdf",bbox_inches='tight',
+        fig.savefig("../figures/MNIST_confusion_net.pdf",bbox_inches='tight',
                                   pad_inches=0.1,
                                   dpi = 1200)
         plt.show()
@@ -128,7 +128,7 @@ if create_heatmap == True:
     heatmap.set_title("Accuracy on MNIST with FFNN")
     fig = heatmap.get_figure()
     plt.show()
-    fig.savefig("./figures/MNIST_heatmap_CE.pdf", bbox_inches='tight',
+    fig.savefig("../figures/MNIST_heatmap_CE.pdf", bbox_inches='tight',
                                                 pad_inches=0.1)
 
 epoch(eta=0.1, penalty=1, epochs=200, create_conf=True)
