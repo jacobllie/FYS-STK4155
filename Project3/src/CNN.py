@@ -15,8 +15,8 @@ class CNN_keras:
                                     n_neurons_connected, labels, eta, lmbd=0):
         """
         input_shape: the shape of input data
-        receptive_field: small area connected to each neuron in next layer
-        n_filters:
+        receptive_field: small area connected to each neuron in next layer (size of filters I think!?!?!?!?!)
+        n_filters: number of filters that is multiplied to the input image
         n_neurons_connected:
         labels:
         """
@@ -55,16 +55,19 @@ class CNN_keras:
 if __name__ == '__main__':
 
     paths = ["/data_images/Apple",
-             "/data_images/Banana"]
-    true_labels = ["apple", "banana"]
+             "/data_images/Banana",
+             "/data_images/Kiwi",
+             "/data_images/Tomato"]
+    true_labels = ["apple", "banana", "kiwi", "tomato"]
 
 
-    data = extract_data(paths,true_labels)
-    im_shape = 20
+
+
+    data = extract_data(paths, true_labels, lim_data=750)
+    im_shape = 50
     data.reshape(im_shape)            # making all data the same shape
     data.shuffle()
-    #data.gray(); data.data = data.data[...,np.newaxis]
-
+    #data.gray()
 
     X_train, X_test, y_train, y_test = train_test_split(data.data,
                                                         data.hot_vector,
@@ -76,8 +79,8 @@ if __name__ == '__main__':
     neuros_con = 50
 
     eta = 0.0001
-    epochs = 10
-    batch_size = 10
+    epochs = 5
+    batch_size = 20
 
     CNN = CNN_keras(input_shape=data_size,
                     receptive_field=rec_field,
@@ -85,8 +88,8 @@ if __name__ == '__main__':
                     n_neurons_connected = neuros_con,
                     labels = true_labels,
                     eta = eta)
-    CNN.add_layer()
 
+    CNN.add_layer()
 
     CNN.model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, verbose=1)
     print()
@@ -95,30 +98,28 @@ if __name__ == '__main__':
 
 
 
-    # predicting on a image that have not been used in training or testing
-    """
-    test_im = np.array(Image.open("./test_images/test_apple.png"))
-    test = extract_data(["/test_images"], ["apple"])
-    test.reshape(20)
-    print(data.data[-1:,...].shape)
-    print(test.data.shape)
-    """
 
-    """
-    pred = CNN.model.predict_step(test_im)
+    # predicting on a image that have not been used in training or testing
+
+    #test_im = np.array(Image.open("./test_images/test_apple.png"))
+    test = extract_data(["/test_images"], ["apple"])
+    test.reshape(im_shape)
+    #test.gray()
+
+    pred = CNN.model.predict_step(test.data[:1,...])
     plt.figure(figsize=[12,6])
     plt.subplot(121)
-    plt.imshow(test_im, cmap="gray")
-    plt.title("CNN predicts: %s = [%.3f, %.3f]" % (true_labels,
-                                                   pred.numpy()[0,0],
-                                                   pred.numpy()[0,1]))
+    plt.imshow(test.data[-1,...], cmap="gray")
+    plt.title("CNN predicts: %s" % (true_labels[np.argmax(pred.numpy())]))
+    for i in range(len(true_labels)):
+        plt.plot([0],[0], label="%s: %.3f" % (true_labels[i], pred.numpy()[0,i]))
+    plt.legend()
     plt.subplot(122)
-    plt.imshow(test_im, cmap="gray")
+    plt.imshow(test.real_data[-1,...], cmap="gray")
     plt.title("Real data")
 
     plt.tight_layout()
     plt.show()
-    """
 
 
 

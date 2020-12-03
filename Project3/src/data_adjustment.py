@@ -2,9 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from PIL import Image
+from numpy import newaxis as nax
 
 class extract_data():
-    def __init__(self, path_to_data, labels):
+    def __init__(self, path_to_data, labels, lim_data=False):
         """
         path_to_data: contains a list of paths to data of interest
         labels: list of categories/labels
@@ -13,13 +14,16 @@ class extract_data():
         self.labels = []
         self.data = []
 
+        if lim_data: print("Limited to %i data for each category." % lim_data)
+
         for path, lab in zip(path_to_data, labels):
             tot_files = len(os.listdir("./"+path))
             for i, dat in enumerate(os.listdir("./"+path)):
                 self.labels.append(lab)
                 self.data.append(np.array(Image.open("./"+os.path.join(path,dat))))
-                #if i >= 1000:
-                #    break
+                if lim_data:
+                    if i > lim_data:
+                        break
                 print("Loading %s data: %i/%i      " % (lab, i+1, tot_files), end="\r")
         print("Loading finished!                            ")
 
@@ -40,21 +44,32 @@ class extract_data():
         """
 
         self.real_data = self.data.copy()
-        print(self.data.shape)
 
-        for i in range(len(self.data)):
-            x,y,_ = self.data[i].shape
+        if len(self.data.shape) == 1:
+            new_data = np.zeros((int(self.data.shape[0]), dat_size, dat_size, int(self.data[0].shape[-1])))
+            for i in range(len(self.data)):
+                x,y,_ = self.data[i].shape
+                skip_x = np.linspace(0,x-1,dat_size).astype("int")
+                skip_y = np.linspace(0,y-1,dat_size).astype("int")
+                dat = self.data[i][skip_x,:]
+                dat = dat[:,skip_y]
+                new_data[i] = dat
+
+            self.data = np.zeros((new_data.shape))
+
+            for i in range(self.data.shape[0]):
+                self.data[i] = new_data[i]
+
+
+        else:
+            x,y = self.data.shape[1:3]
             skip_x = np.linspace(0,x-1,dat_size).astype("int")
             skip_y = np.linspace(0,y-1,dat_size).astype("int")
-            self.data[i] = self.data[i][skip_x,:]
-            self.data[i] = self.data[i][:,skip_y]
 
+            data = self.data[:, skip_x, :, :]
+            data = data[:, :, skip_y, :]
+            self.data = data.copy()
 
-        new_data = np.zeros((self.data.shape + self.data[0].shape))
-
-        for i in range(len(self.data)):
-            new_data[i] = self.data[i]
-        self.data = np.uint8(new_data.copy())
 
 
 
@@ -64,6 +79,7 @@ class extract_data():
         coloured instead of RGB
         """
         self.data = np.mean(self.data, axis=3)
+        self.data = self.data[...,nax]
 
 
 
@@ -99,13 +115,13 @@ if __name__ == '__main__':
     #plt.show()
 
 
-
     paths = ["/data_images/Apple",
              "/data_images/Banana"]
     labels = ["apple", "banana"]
 
     test = extract_data(paths, labels)
-    test.reshape(dat_size=50)
+    sh = 20
+    test.reshape(dat_size=sh)
     #test.gray()
     test.shuffle()
 
@@ -115,15 +131,18 @@ if __name__ == '__main__':
     plt.imshow(test.data[i], cmap="gray")
     plt.title("label = %s,  hot = %s" % (test.labels[i], test.hot_vector[i]))
     plt.show()
-    #plt.close()
+    plt.close()
 
-    """
+
     #test_im = np.array(Image.open("./test_images/test_apple.png"))
     test = extract_data(["/test_images"], ["apple"])
-    test.reshape(20)
-    print(data.data[-1:,...].shape)
-    print(test.data.shape)
-    """
+    test.reshape(dat_size=sh)
+    print("Data shape: ", test.data.shape)
+
+    plt.imshow(test.data[0])
+    plt.show()
+
+
 
 
 
