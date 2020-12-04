@@ -5,27 +5,29 @@ from PIL import Image
 from numpy import newaxis as nax
 
 class extract_data():
-    def __init__(self, path_to_data, labels, lim_data=False):
+    def __init__(self, path_to_data, labels, lim_data=False, from_data=False):
         """
         path_to_data: contains a list of paths to data of interest
         labels: list of categories/labels
         Note! path_to_data and labels must be correctly ordered
         """
+
         self.labels = []
         self.data = []
+        run_again = True
 
         if lim_data: print("Limited to %i data for each category." % lim_data)
 
         for path, lab in zip(path_to_data, labels):
             tot_files = len(os.listdir("./"+path))
-            for i, dat in enumerate(os.listdir("./"+path)):
+            for i, dat in enumerate(os.listdir("./"+path)[from_data:]):
                 self.labels.append(lab)
                 self.data.append(np.array(Image.open("./"+os.path.join(path,dat))))
                 if lim_data:
                     if i > lim_data:
                         break
-                print("Loading %s data: %i/%i      " % (lab, i+1, tot_files), end="\r")
-        print("Loading finished!                            ")
+                print("Loading %s data: %i/%i      " % (lab, i+1+from_data, tot_files), end="\r")
+        print("Loading data finished!                            ")
 
 
         self.data = np.array(self.data)
@@ -56,9 +58,8 @@ class extract_data():
                 new_data[i] = dat
 
             self.data = np.zeros((new_data.shape))
-
-            for i in range(self.data.shape[0]):
-                self.data[i] = new_data[i]
+            self.data[:] = new_data
+            del new_data            # cleaning memory
 
 
         else:
@@ -98,34 +99,66 @@ class extract_data():
 
 
 
+    def delete_all_data(self):
+        """
+        This function is used to spare the RAM if needed
+        """
+        try:
+            del self.data
+            print("Deleted self.data")
+        except: pass
+
+        try:
+            del self.real_data
+            print("Deleted self.real_data")
+        except: pass
+
+        try:
+            del self.labels
+            print("Deleted self.labels")
+        except: pass
+
+        try:
+            del self.hot_vector
+            print("Deleted self.hot_vector")
+        except: pass
+
+
 
 
 if __name__ == '__main__':
 
-    #path = ["/images"]
-    #lab = ["UiO"]
-
-    #test = adjust_images(path, lab)
-    #test.reshape_images(img_size=50)
-    #test.gray_images()
-
-    #print(test.images[0].shape)
-    #print(test.labels)
-    #plt.imshow(test.images[0])
-    #plt.show()
-
-
+    """
     paths = ["/data_images/Apple",
-             "/data_images/Banana"]
-    labels = ["apple", "banana"]
+             "/data_images/Banana",
+             "/data_images/Kiwi",
+             "/data_images/Mango",
+             "/data_images/Orange",
+             "/data_images/Pear",
+             "/data_images/Tomato"]
+    true_labels = ["apple", "banana", "kiwi", "mango",
+                   "orange", "pear", "tomato"]
+    """
 
-    test = extract_data(paths, labels)
-    sh = 20
-    test.reshape(dat_size=sh)
+    paths = ["/data_images/Banana",
+             "/data_images/Tomato"]
+    true_labels = ["banana", "tomato"]
+
+    tot_data = 1000
+    lim_data = tot_data/len(paths)
+    from_data = 0*lim_data
+    test = extract_data(path_to_data=paths,
+                        labels=true_labels,
+                        lim_data=1000,
+                        from_data=2000)
+
+    #sh = 20
+    #test.reshape(dat_size=sh)
     #test.gray()
-    test.shuffle()
+    #test.shuffle()
 
 
+    """
     print("Data shape: ", test.data.shape)
     i = 0
     plt.imshow(test.data[i], cmap="gray")
@@ -141,7 +174,7 @@ if __name__ == '__main__':
 
     plt.imshow(test.data[0])
     plt.show()
-
+    """
 
 
 
