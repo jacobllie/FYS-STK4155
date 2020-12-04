@@ -9,6 +9,9 @@ class ExtractData():
     def __init__(self, data_dir, fruit, samples, dat_size=50):
         """
         data_dir: path to data
+        fruit: fruit
+        samples: number of pictures of that fruit
+        dat_size: reshape image to dat_size x dat_size pixels
         """
         self.data = []
         all_files = []
@@ -37,6 +40,9 @@ class ExtractData():
             self.data.append(img_resize.flatten())
 
     def gray_scale(self):
+        """
+        Make image gray_scale
+        """
         dat_size = self.dat_size*self.dat_size
         data = []
         for i, image in enumerate(self.data):
@@ -47,4 +53,7 @@ class ExtractData():
         self.data = data
 
     def __call__(self):
+        """
+        Returns images as numpy arrays in list
+        """
         return self.data
