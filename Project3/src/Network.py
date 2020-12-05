@@ -7,7 +7,7 @@ class DenseLayer:
         stddev=1
         if Glorot:
             #try with Glorot inializations of weights
-            variance = 2.0/(input + output)
+            variance = 2.0/(inputs + outputs)
             stddev = np.sqrt(variance)
         self.weights = stddev*random.randn(inputs, outputs)
         self.b = random.randn(1, outputs)
@@ -15,6 +15,7 @@ class DenseLayer:
 
     def __call__(self, X):
         self.z = X @ self.weights + self.b
+        #print(self.z)
         self.a = self.act_func(self.z)
         self.da = self.act_func.deriv(self.z)
         return self.a
@@ -47,11 +48,11 @@ class NN:
         delta_l = (delta_l @ L[1].weights.T) * L[0].da
         L[0].weights = L[0].weights - eta*(x.T @ delta_l) \
             - eta*penalty*L[0].weights/len(y)
-        L[0].b = L[0].b - eta*delta_l[0, :]
+        L[0].b = L[0].b - eta*delta_l[0,:]
 
 
     def SGD(self, mini_batch_size, X_train_shuffle, z_train_shuffle, eta, penalty=0):
         for j in range(0,X_train_shuffle.shape[0],mini_batch_size):
-            self.backprop(self.cost, X_train_shuffle[j:j+mini_batch_size],
+            self.backprop(X_train_shuffle[j:j+mini_batch_size],
                 z_train_shuffle[j:j+mini_batch_size],eta,penalty)
         return X_train_shuffle, z_train_shuffle
