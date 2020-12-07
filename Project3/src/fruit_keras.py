@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+import seaborn as sb
 import matplotlib.pyplot as plt
 
 from keras.models import Sequential
@@ -11,6 +12,7 @@ from data_adjustment import extract_data
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from cost_functions import accuracy
+from sklearn.metrics import confusion_matrix
 
 def NN_keras(input, hidden_layers, output, act_func, eta, penalty=0):
     """
@@ -39,30 +41,22 @@ def NN_keras(input, hidden_layers, output, act_func, eta, penalty=0):
 if __name__ == '__main__':
 
     paths = ["../images/Apple/Total Number of Apples",
-             "../images/Banana"]
-             #"../images/Kiwi/Total Number of Kiwi fruit",
-             #"../images/Mango",
-             #"../images/Orange",
-             #"../images/Pear",
-             #"../images/Tomato"]
-    true_labels = ["apple", "banana"]#, "kiwi", "mango",
-                   #"orange", "pear", "tomato"]
+             "../images/Banana",
+             "../images/Kiwi",
+             "../images/Mango",
+             "../images/Orange",
+             "../images/Pear",
+             "../images/Tomatoes"]
 
-    #paths = ["/data_images/Banana",
-    #         "/data_images/Tomato"]
-    #true_labels = ["banana", "tomato"]
+    true_labels = ["apple", "banana", "kiwi", "mango", "orange", "pear",
+                   "tomato"]
 
     num_fruits = len(true_labels)
 
     im_shape = 50
-    #data_size = data.data[0].shape
     data_size = (im_shape, im_shape, 3)
 
-    rec_field = 3
-    filters = 20
-    neuros_con = 50
-
-    eta = 0.0005
+    eta = 0.005
     lmbd = 0.001
     epochs = 2
     batch_size = 5
@@ -73,15 +67,14 @@ if __name__ == '__main__':
     """
     max_data = 500
     lim_data = int(max_data/len(paths))
-    #tot_data = 0
+    print(lim_data)
     lens = []
     for path in paths:
-        #tot_data += len(os.listdir("./"+path))
         lens.append(len(os.listdir("./"+path)))
     min_len = np.min(lens)
-    print(min_len)
+
     tot_data = min_len * len(paths)
-    runs = int(tot_data / max_data)
+    runs = int(tot_data / max_data) - 1
 
     print("---------------------------------------------")
     print("Unique fruits:           ", len(paths))
@@ -95,18 +88,21 @@ if __name__ == '__main__':
 
     layers = [3000, 1000, 200, 10]
 
-    NN = NN_keras(input = im_shape*im_shape, hidden_layers = layers,
-                  output=num_fruits, act_func = "relu", eta = eta, penalty = lmbd)
+    NN = NN_keras(input = im_shape*im_shape*3, hidden_layers = layers,
+                  output=num_fruits, act_func = "relu", eta = eta, penalty=lmbd)
 
     acc_score = accuracy()
+    scaler = StandardScaler()
 
-    for i in range(runs):
+    pred_num_label = []
+    true_num_label = []
+
+    for i in range(3):
         print("Run:   ", i+1)
         data = extract_data(paths, true_labels, lim_data=lim_data,
                             from_data=i*lim_data)
         data.reshape(im_shape)            # making all data the same shape
-        data.shuffle()
-        data.gray()
+        #data.gray()
         data.flatten()
 
         #del data.data
@@ -114,32 +110,72 @@ if __name__ == '__main__':
                                                             data.hot_vector,
                                                             train_size=0.8)
 
-        X_train, X_test = X_train/255, X_test/255           # scaling image data
+        scaler.fit(X_train)
+        X_train = scaler.transform(X_train)
+        X_test = scaler.transform(X_test)
 
         NN.fit(X_train, y_train, epochs=epochs, batch_size=batch_size,
                verbose=1)
+
         prediction = np.argmax(NN.predict_step(X_test), axis=1)
-        score = acc_score(np.argmax(y_test, axis=1), prediction)
+        true_label = np.argmax(y_test, axis=1)
+
+        score = acc_score(true_label, prediction)
         data.delete_all_data()          # clear the memory
         print("Accuracy = {:.4}".format(score))
 
     # predicting on a image that have not been used in training or testing
 
-    test = extract_data(["../images/test_images"], ["banana"])
-    test.reshape(im_shape)         # making all data the same shape
-    test.shuffle()
-    test.gray()
-    test.flatten()
-    pred = np.argmax(NN.predict_step(test.data))
-    print(NN.predict_step(test.data))
-    plt.figure(figsize=[12,6])
-    plt.subplot(121)
-    plt.tight_layout()
-    plt.imshow(test.data.reshape((50,50)), cmap="gray")
-    plt.title("CNN predicts: %s" %(true_labels[pred]))
-    plt.subplot(122)
-    plt.imshow(test.real_data[-1,...], cmap="gray")
-    plt.title("Real data %s" %(test.labels[0]))
-    plt.tight_layout()
-    plt.savefig("Keras_NN.pdf")
+    test_network = extract_data(paths, true_labels, lim_data=lim_data,
+                        from_data=(runs+1)*lim_data)
+    test_network.reshape(im_shape)            # making all data the same shape
+    #test_network.gray()
+    test_network.flatten()
+
+    test_images = test_network.data
+    test_labels = test_network.labels
+    one_hot = test_network.hot_vector
+
+    scaler.fit(test_images)
+    test_images = scaler.transform(test_images)
+
+    test_prediction = np.argmax(NN.predict_step(test_images), axis=1)
+    test_num_label = np.argmax(one_hot, axis=1)
+
+    indices = np.random.randint(len(test_prediction), size=5)
+    for ind in indices:
+        plt.figure(figsize=[12,6])
+        plt.subplot(121)
+        plt.tight_layout()
+        plt.imshow(test_images[ind].reshape((im_shape, im_shape,3)), cmap="gray")
+        plt.title("NN predicts: %s" %(true_labels[test_prediction[ind]]))
+        plt.subplot(122)
+        plt.imshow(test_network.real_data[ind], cmap="gray")
+        plt.title("Real data %s" %(test_labels[ind]))
+        plt.tight_layout()
+        plt.savefig("Keras_NN.pdf")
+        plt.show()
+
+    test_network.delete_all_data()          # clear the memory
+
+    conf_matrix = confusion_matrix(test_prediction, test_num_label,
+                                   normalize="true")
+
+    heatmap = sb.heatmap(conf_matrix, cmap="viridis",
+                         xticklabels=[label for label in true_labels],
+                         yticklabels=[label for label in true_labels],
+                         cbar_kws={'label': 'Accuracy'},
+                         fmt = ".2",
+                         edgecolor="none",
+                         annot = True)
+
+    #heatmap.set_xlabel("pred")
+    #heatmap.set_ylabel("true")
+
+    heatmap.set_title(r"Keras Neural Network prediction of fruit")
+    fig = heatmap.get_figure()
+    plt.yticks(rotation=0)
+    fig.savefig("Keras_NN_conf.pdf",bbox_inches='tight',
+                              pad_inches=0.1,
+                              dpi = 1200)
     plt.show()

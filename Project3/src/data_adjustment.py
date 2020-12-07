@@ -14,6 +14,7 @@ class extract_data():
 
         self.labels = []
         self.data = []
+        self.gray_scale = False
         run_again = True
 
         if lim_data: print("Limited to %i data for each category." % lim_data)
@@ -31,6 +32,7 @@ class extract_data():
 
 
         self.data = np.array(self.data)
+        self.real_data = self.data.copy()
         self.labels = np.array(self.labels)
         self.hot_vector = np.zeros((len(self.data), len(labels)))
         eye = np.eye(len(labels))
@@ -44,8 +46,6 @@ class extract_data():
         Adjust the size of all data,
         useful so that all inputs has same size
         """
-
-        self.real_data = self.data.copy()
 
         if len(self.data.shape) == 1:
             new_data = np.zeros((int(self.data.shape[0]), dat_size, dat_size, int(self.data[0].shape[-1])))
@@ -81,7 +81,7 @@ class extract_data():
         """
         self.data = np.mean(self.data, axis=3)
         self.data = self.data[...,nax]
-
+        self.gray_scale = True
 
 
 
@@ -97,7 +97,16 @@ class extract_data():
         self.labels = self.labels[shuffle]
         self.hot_vector = self.hot_vector[shuffle]
 
-
+    def flatten(self):
+        if self.gray_scale:
+            self.data = self.data.reshape(self.data.shape[0],
+                                          self.data.shape[1]
+                                          *self.data.shape[2])
+        else:
+            self.data = self.data.reshape(self.data.shape[0],
+                                          self.data.shape[1]
+                                          *self.data.shape[2]
+                                          *self.data.shape[3])
 
     def delete_all_data(self):
         """
