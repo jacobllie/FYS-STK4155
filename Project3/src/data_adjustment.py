@@ -132,6 +132,11 @@ class extract_data():
             print("Deleted self.hot_vector")
         except: pass
 
+        try:
+            del self.gray_scale
+            print("Deleted self.gray_scale")
+        except: pass
+
 
 
 

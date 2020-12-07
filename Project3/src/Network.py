@@ -11,7 +11,7 @@ class DenseLayer:
             variance = 2.0/(inputs + outputs)
             stddev = np.sqrt(variance)
         self.weights = stddev*random.randn(inputs, outputs)
-        self.b = random.randn(1, outputs)
+        self.b = np.zeros((1, outputs))
         self.act_func = act_func
 
     def __call__(self, X):
