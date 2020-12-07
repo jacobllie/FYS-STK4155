@@ -2,8 +2,9 @@ import numpy as np
 from numpy import random
 
 class DenseLayer:
-    def __init__(self, inputs, outputs, act_func, Glorot=False):
-        np.random.seed(200)
+    def __init__(self, inputs, outputs, act_func, Glorot=False, Seed=False):
+        if Seed:
+            np.random.seed(Seed)
         stddev=1
         if Glorot:
             #try with Glorot inializations of weights
