@@ -1,4 +1,5 @@
 import os
+import pickle
 
 import numpy as np
 import seaborn as sb
@@ -40,7 +41,17 @@ def NN_keras(input, hidden_layers, output, act_func, eta, penalty=0):
 
 if __name__ == '__main__':
 
-    paths = ["../images/Apple/Total Number of Apples",
+    color_input = input("Color or Black-white [C/Bw]: ")
+    im_shape = int(input("Size of N images (N x N pixels): "))
+
+    if color_input == "C" or color_input == "c":
+        color_scale = False
+    elif color_input == "Bw" or color_input == "bw":
+        color_scale = True
+    else:
+        raise ValueError("Invalid input argument")
+
+    paths = ["../images/Apple",
              "../images/Banana",
              "../images/Kiwi",
              "../images/Mango",
@@ -53,12 +64,11 @@ if __name__ == '__main__':
 
     num_fruits = len(true_labels)
 
-    im_shape = 50
     data_size = (im_shape, im_shape, 3)
 
-    eta = 0.005
+    eta = 0.0001
     lmbd = 0.001
-    epochs = 2
+    epochs = 5
     batch_size = 5
 
     """
@@ -88,48 +98,61 @@ if __name__ == '__main__':
 
     layers = [3000, 1000, 200, 10]
 
-    NN = NN_keras(input = im_shape*im_shape*3, hidden_layers = layers,
-                  output=num_fruits, act_func = "relu", eta = eta, penalty=lmbd)
+    if color_scale:
+        NN = NN_keras(input = im_shape*im_shape, hidden_layers = layers,
+                      output=num_fruits, act_func = "relu", eta = eta,
+                      penalty=lmbd)
+    else:
+        NN = NN_keras(input = im_shape*im_shape*3, hidden_layers = layers,
+                      output=num_fruits, act_func = "relu", eta = eta,
+                      penalty=lmbd)
 
     acc_score = accuracy()
     scaler = StandardScaler()
 
-    pred_num_label = []
-    true_num_label = []
-
-    for i in range(3):
+    for i in range(20):
         print("Run:   ", i+1)
         data = extract_data(paths, true_labels, lim_data=lim_data,
                             from_data=i*lim_data)
         data.reshape(im_shape)            # making all data the same shape
-        #data.gray()
+        if color_scale:
+            data.gray()
         data.flatten()
 
         #del data.data
-        X_train, X_test, y_train, y_test = train_test_split(data.data,
+        X_train, X_valid, y_train, y_valid = train_test_split(data.data,
                                                             data.hot_vector,
                                                             train_size=0.8)
 
-        scaler.fit(X_train)
+        if i==0:
+            scaler.fit(X_train)
         X_train = scaler.transform(X_train)
-        X_test = scaler.transform(X_test)
+        X_valid = scaler.transform(X_valid)
 
         NN.fit(X_train, y_train, epochs=epochs, batch_size=batch_size,
                verbose=1)
 
-        prediction = np.argmax(NN.predict_step(X_test), axis=1)
-        true_label = np.argmax(y_test, axis=1)
+        prediction = np.argmax(NN.predict_step(X_valid), axis=1)
+        true_label = np.argmax(y_valid, axis=1)
 
         score = acc_score(true_label, prediction)
         data.delete_all_data()          # clear the memory
         print("Accuracy = {:.4}".format(score))
+
+    print("-------------------------")
+    print("FINISHED TRAINING NETWORK")
+    print("-------------------------")
+
+    with open('network_keras_'+color_input+'.pkl', 'wb') as output:
+        pickle.dump(network, output, pickle.HIGHEST_PROTOCOL)
 
     # predicting on a image that have not been used in training or testing
 
     test_network = extract_data(paths, true_labels, lim_data=lim_data,
                         from_data=(runs+1)*lim_data)
     test_network.reshape(im_shape)            # making all data the same shape
-    #test_network.gray()
+    if color_scale:
+        test_network.gray()
     test_network.flatten()
 
     test_images = test_network.data
@@ -142,18 +165,29 @@ if __name__ == '__main__':
     test_prediction = np.argmax(NN.predict_step(test_images), axis=1)
     test_num_label = np.argmax(one_hot, axis=1)
 
+    print("Accuracy on test data: %.2f" %acc_score(test_prediction,
+                                                   test_num_label))
+
     indices = np.random.randint(len(test_prediction), size=5)
     for ind in indices:
         plt.figure(figsize=[12,6])
         plt.subplot(121)
         plt.tight_layout()
-        plt.imshow(test_images[ind].reshape((im_shape, im_shape,3)), cmap="gray")
+        if color_scale:
+            plt.imshow(test_images[ind].reshape((im_shape, im_shape)),
+                       cmap="gray")
+        else:
+            plt.imshow(test_images[ind].reshape((im_shape, im_shape,3)),
+                       cmap="gray")
         plt.title("NN predicts: %s" %(true_labels[test_prediction[ind]]))
         plt.subplot(122)
         plt.imshow(test_network.real_data[ind], cmap="gray")
         plt.title("Real data %s" %(test_labels[ind]))
         plt.tight_layout()
-        plt.savefig("Keras_NN.pdf")
+        plt.savefig("../results/Keras/Keras_NN_"+color_input+str(ind)+".pdf",
+                    bbox_inches='tight',
+                    pad_inches=0.1,
+                    dpi = 1200)
         plt.show()
 
     test_network.delete_all_data()          # clear the memory
@@ -169,13 +203,14 @@ if __name__ == '__main__':
                          edgecolor="none",
                          annot = True)
 
-    #heatmap.set_xlabel("pred")
-    #heatmap.set_ylabel("true")
+    heatmap.set_xlabel("pred")
+    heatmap.set_ylabel("true")
 
     heatmap.set_title(r"Keras Neural Network prediction of fruit")
     fig = heatmap.get_figure()
     plt.yticks(rotation=0)
-    fig.savefig("Keras_NN_conf.pdf",bbox_inches='tight',
-                              pad_inches=0.1,
-                              dpi = 1200)
+    fig.savefig("../results/Keras/Keras_NN_"+color_input+".pdf",
+                bbox_inches='tight',
+                pad_inches=0.1,
+                dpi = 1200)
     plt.show()
