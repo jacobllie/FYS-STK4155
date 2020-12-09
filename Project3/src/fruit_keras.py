@@ -1,5 +1,4 @@
 import os
-import pickle
 
 import numpy as np
 import seaborn as sb
@@ -91,7 +90,7 @@ if __name__ == '__main__':
     print("Total fruits:            ", tot_data)
     print("Image resolution:         %ix%i" % (im_shape, im_shape))
     print("Max data set to:         ", max_data)
-    print("Total runs:              ", runs)
+    print("Total runs:              ", 20)
     print("Total fruit per run:     ", lim_data)
     print("---------------------------------------------")
     print()
@@ -143,9 +142,6 @@ if __name__ == '__main__':
     print("FINISHED TRAINING NETWORK")
     print("-------------------------")
 
-    with open('network_keras_'+color_input+'.pkl', 'wb') as output:
-        pickle.dump(network, output, pickle.HIGHEST_PROTOCOL)
-
     # predicting on a image that have not been used in training or testing
 
     test_network = extract_data(paths, true_labels, lim_data=lim_data,
@@ -186,8 +182,7 @@ if __name__ == '__main__':
         plt.tight_layout()
         plt.savefig("../results/Keras/Keras_NN_"+color_input+str(ind)+".pdf",
                     bbox_inches='tight',
-                    pad_inches=0.1,
-                    dpi = 1200)
+                    pad_inches=0.1)
         plt.show()
 
     test_network.delete_all_data()          # clear the memory
@@ -211,6 +206,5 @@ if __name__ == '__main__':
     plt.yticks(rotation=0)
     fig.savefig("../results/Keras/Keras_NN_"+color_input+".pdf",
                 bbox_inches='tight',
-                pad_inches=0.1,
-                dpi = 1200)
+                pad_inches=0.1)
     plt.show()
