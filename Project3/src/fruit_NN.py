@@ -18,6 +18,7 @@ if __name__ == '__main__':
 
     color_input = input("Color or Black-white [C/Bw]: ")
     im_shape = int(input("Size of N images (N x N pixels): "))
+    save_network = input("Save network? [Y/n]: ")
 
     if color_input == "C" or color_input == "c":
         color_scale = False
@@ -25,6 +26,11 @@ if __name__ == '__main__':
         color_scale = True
     else:
         raise ValueError("Invalid input argument")
+
+    if save_network == "Y" or save_network == "y":
+        save_network = True
+    else:
+        save_network = False
 
     paths = ["../images/Apple/",
              "../images/Banana",
@@ -66,7 +72,7 @@ if __name__ == '__main__':
     print("Total fruits:            ", tot_data)
     print("Image resolution:         %ix%i" % (im_shape, im_shape))
     print("Max data set to:         ", max_data)
-    print("Total runs:              ", runs)
+    print("Total runs:              ", 20)
     print("Total fruit per run:     ", lim_data)
     print("---------------------------------------------")
 
@@ -119,8 +125,9 @@ if __name__ == '__main__':
     print("FINISHED TRAINING NETWORK")
     print("-------------------------")
 
-    with open('network_NN_'+color_input+'.pkl', 'wb') as output:
-        pickle.dump(network, output, pickle.HIGHEST_PROTOCOL)
+    if save_network:
+        with open('network_NN_'+color_input+'.pkl', 'wb') as output:
+            pickle.dump(network, output, pickle.HIGHEST_PROTOCOL)
 
     # predicting on a image that have not been used in training or testing
 
