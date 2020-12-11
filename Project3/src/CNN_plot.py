@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sb
 import sys
+import os
+
 
 gray = input("gray/color?: ")
 if gray == "gray":
@@ -14,6 +16,12 @@ else:
 
 path = "../plotting_data/"
 
+
+
+
+"""
+Creating a confusion matrix
+"""
 
 create_conf_matrix = input("Analyse confusion matrix [Y/n]: ")
 
@@ -39,8 +47,8 @@ if create_conf_matrix == True:
                           edgecolor="none",
                           annot = True)
     plt.yticks(rotation=0)
-    heatmap.set_xlabel("pred")
-    heatmap.set_ylabel("true")
+    heatmap.set_xlabel("Prediction")
+    heatmap.set_ylabel("True labelling")
 
     heatmap.set_title("Confusion matrix for fruit recognition (Gray)")
     fig = heatmap.get_figure()
@@ -48,41 +56,78 @@ if create_conf_matrix == True:
     #                                            pad_inches=0.1)
     plt.show()
 
-create_accuracy_matrix = input("Analyse accuracy map [Y/n]: ")
 
+
+
+
+"""
+Creating an accuracy map
+"""
+
+create_accuracy_matrix = input("Analyse accuracy map [Y/n]: ")
 
 if create_accuracy_matrix == "Y" or create_accuracy_matrix == "y":
     create_accuracy_matrix = True
+    print("These are the current files available for making an accuracy map:")
+    i = 0
+    path_list = []
+    for path in os.listdir("../results/plotting_data/"):
+        if path[:3]=="acc":
+            print(i, path)
+            path_list.append(path)
+            i += 1
+    num = input("Please choose the file to plot by entering the corresponding integer: ")
+    try:
+        acc_plot = np.load("../results/plotting_data/"+path_list[int(num)])
+    except:
+        assert False, "'%s' not a valid integer! Please try again. " % num
+
 elif create_accuracy_matrix == "N" or create_accuracy_matrix == "n":
     create_accuracy_matrix = False
 else:
     print("Please input Y or n!")
     sys.exit()
-if create_accuracy_matrix == True:
-    eta = [0.0005,0.001,0.005,0.01]
-    lmbd = [0.0001,0.0005,0.001,0.005]
-    if gray:
-        accuracy_map = np.load(path+"CNN_accuracy_map_gray.npy")
-    else:
-        accuracy_map =np.load(path+"CNN_accuracy_map_color.npy")
 
-    heatmap = sb.heatmap(accuracy_map.T,cmap="viridis",
-                          xticklabels=["%.4f" %i for i in eta],
-                          yticklabels=["%.4f" %i for i in lmbd],
+
+if create_accuracy_matrix == True:
+    if "eta" in path_list[int(num)] and "lambda" in path_list[int(num)]:
+        param1 = [0.0005,0.001,0.005,0.01]         # eta values
+        param2 = [0.0001,0.0005,0.001,0.005]      # lambda values
+        param_name = [r"$\eta$", r"$\lambda$"]
+    elif "epoch" in path_list[int(num)] and "batch" in path_list[int(num)]:
+        param1 = [1, 3, 5, 10]                 # epoch values
+        param2 = [1, 3, 5, 10]             # batch size values
+        param_name = ["Epochs", "Batch size"]
+
+
+    heatmap = sb.heatmap(acc_plot,cmap="viridis",
+                          xticklabels=["%s" %i for i in param2],
+                          yticklabels=["%s" %i for i in param1],
                           cbar_kws={'label': 'Accuracy'},
                           fmt = ".4",
                           edgecolor="none",
                           annot = True)
     plt.yticks(rotation=0)
-    heatmap.set_xlabel(r"$\eta$")
-    heatmap.set_ylabel(r"$\lambda$")
+    heatmap.set_xlabel(param_name[1])
+    heatmap.set_ylabel(param_name[0])
+
 
     heatmap.set_title("Accuracy map for fruit recognition")
     fig = heatmap.get_figure()
-    #fig.savefig("../figures/CNN_accuracy_map.pdf", bbox_inches='tight',
-                                                   #pad_inches=0.1)
+    plt.tight_layout()
     plt.show()
+    save_fig = input("Save figure [Y/n]? ")
+    if save_fig=="Y" or save_fig=="y":
+        name = input("Saving file as *.pdf file. Please enter name of file: ")
+        fig.savefig("../figures/%s.pdf" % name, pad_inches=0.1)
+        print("File saved successfully in the ../figures/ folder!")
 
+
+
+
+"""
+Creating a validation accuracy plot
+"""
 
 create_val_accuracy = input("Analyse validation accuracy as a function of data trained [Y/n]: ")
 
