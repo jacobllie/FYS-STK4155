@@ -5,13 +5,13 @@ from sklearn.model_selection import train_test_split
 import os
 import time as t
 
-paths = ["/data_images/Apple",
-         "/data_images/Banana",
-         "/data_images/Kiwi",
-         "/data_images/Mango",
-         "/data_images/Orange",
-         "/data_images/Pear",
-         "/data_images/Tomato"]
+paths = ["../images/Apple/",
+         "../images/Banana",
+         "../images/Kiwi",
+         "../images/Mango",
+         "../images/Orange",
+         "../images/Pear",
+         "../images/Tomatoes"]
 true_labels = ["apple", "banana", "kiwi", "mango",
                "orange", "pear", "tomato"]
 
