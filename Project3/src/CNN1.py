@@ -7,13 +7,13 @@ import time
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from PIL import Image
-paths = ["../images/Apple/Total Number of Apples",
+paths = ["../images/Apple",
            "../images/Banana",
-           "../images/Kiwi/Total Number of Kiwi fruit",
+           "../images/Kiwi",
            "../images/Mango",
            "../images/Orange",
            "../images/Pear",
-           "../images/Tomato"]
+           "../images/Tomatoes"]
 true_labels = ["apple", "banana", "kiwi", "mango",
              "orange", "pear", "tomato"]
 
@@ -89,16 +89,16 @@ if eta_lambda:
     eta = [0.01]
     lmbd = [0.0005]
 else:
-    eta = [0.0005,0.001]#,0.005,0.01]
-    lmbd = [0.0001,0.0005]#,0.001,0.005]
+    eta = [0.0005,0.001,0.005,0.01]
+    lmbd = [0.0001,0.0005,0.001,0.005]
 
-epochs = 1
+epochs = 10
 batch_size = 5
 """
 if im_shape is large (e.g. 200), max_data should be low (e.g. 500)
 if im_shape is low (e.g. 50), max_data can be large (e.g. 5000)
 """
-max_data = 3000
+max_data = 500
 lim_data = int(max_data/len(paths))
 #tot_data = 0
 lens = []
@@ -192,19 +192,19 @@ for j in range(len(eta)):
 #storing the values necessary for plotting
           if create_confusion:
               if gray:
-                  np.save("../plotting_data/CNN_confusion_gray",conf_matrix)
+                  np.save("../results/plotting_data/CNN_confusion_gray",conf_matrix)
               else:
-                  np.save("../plotting_data/CNN_confusion_color",conf_matrix)
+                  np.save("../results/plotting_data/CNN_confusion_color",conf_matrix)
 if eta_lambda == False:
     if gray:
-        np.save("../plotting_data/CNN_accuracy_map_gray",accuracy_map)
+        np.save("../results/plotting_data/CNN_accuracy_map_gray",accuracy_map)
     else:
-        np.save("../plotting_data/CNN_accuracy_map_color",accuracy_map)
+        np.save("../results/plotting_data/CNN_accuracy_map_color",accuracy_map)
 if create_val_accuracy:
-    np.save("../plotting_data/CNN_accuracy_validation",score_val)
-    np.save("../plotting_data/CNN_frac_data",frac_data)
+    np.save("../results/plotting_data/CNN_accuracy_validation",score_val)
+    np.save("..//results/plotting_data/CNN_frac_data",frac_data)
 if create_training_accuracy:
-    np.save("../plotting_data/CNN_accuracy_epoch",accuracy_epoch)
+    np.save("../results/plotting_data/CNN_accuracy_epoch",accuracy_epoch)
 print("Time spent on training {:.4}s".format(trainig_time))
 
 """

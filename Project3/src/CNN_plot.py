@@ -12,7 +12,7 @@ else:
   print("Please input gray or color!")
   sys.exit()
 
-path = "../plotting_data/"
+path = "../results/plotting_data/"
 
 
 create_conf_matrix = input("Analyse confusion matrix [Y/n]: ")
@@ -42,11 +42,19 @@ if create_conf_matrix == True:
     heatmap.set_xlabel("pred")
     heatmap.set_ylabel("true")
 
-    heatmap.set_title("Confusion matrix for fruit recognition (Gray)")
-    fig = heatmap.get_figure()
-    #fig.savefig("../figures/CNN_confusion_gray.pdf", bbox_inches='tight',
-    #                                            pad_inches=0.1)
+    if gray:
+        heatmap.set_title("Confusion matrix for fruit recognition (Gray)")
+        fig = heatmap.get_figure()
+        fig.savefig("../results/CNN/CNN_confusion_gray.pdf", bbox_inches='tight',
+                                                         pad_inches=0.1)
+    else:
+        heatmap.set_title("Confusion matrix for fruit recognition (Color)")
+        fig = heatmap.get_figure()
+        fig.savefig("../results/CNN/CNN_confusion_color.pdf", bbox_inches='tight',
+                                                         pad_inches=0.1)
     plt.show()
+
+
 
 create_accuracy_matrix = input("Analyse accuracy map [Y/n]: ")
 
@@ -76,11 +84,18 @@ if create_accuracy_matrix == True:
     plt.yticks(rotation=0)
     heatmap.set_xlabel(r"$\eta$")
     heatmap.set_ylabel(r"$\lambda$")
-
-    heatmap.set_title("Accuracy map for fruit recognition")
-    fig = heatmap.get_figure()
-    #fig.savefig("../figures/CNN_accuracy_map.pdf", bbox_inches='tight',
-                                                   #pad_inches=0.1)
+    if gray:
+        heatmap.set_title("Accuracy map for fruit recognition (Gray)")
+        fig = heatmap.get_figure()
+        #fig.savefig("../results/CNN/CNN_accuracy_map_gray.pdf", bbox_inches='tight',
+        #                                               pad_inches=0.1)
+        pass
+    else:
+        heatmap.set_title("Accuracy map for fruit recognition (Color)")
+        fig = heatmap.get_figure()
+        #fig.savefig("../results/CNN/CNN_accuracy_map_color.pdf", bbox_inches='tight',
+        #                                               pad_inches=0.1)
+        pass
     plt.show()
 
 
@@ -99,12 +114,12 @@ if create_val_accuracy == True:
     frac_data = np.load(path+"CNN_frac_data.npy")
 
     plt.style.use("seaborn")
-    plt.title("Accuracy as a function of runs")
+    plt.title("Accuracy as a function of runs (Color)")
     plt.xlabel("% of data used for training")
     plt.ylabel("Accuracy")
     plt.plot(frac_data,accuracy_val[:,1],"purple",label="Validation")
     plt.legend()
-    #plt.savefig("../figures/CNN_val_acc_layers.pdf",bbox_inches="tight",
+    #plt.savefig("../results/CNN/CNN_val_acc_layers.pdf",bbox_inches="tight",
     #                                                 pad_inches=0.1)
     plt.show()
 
@@ -128,6 +143,6 @@ if create_epoch_accuracy == True:
     for i in range(len(accuracy_epoch)):
         plt.plot(np.arange(accuracy_epoch.shape[1]),accuracy_epoch[i,:],label="{:.3}%".format(frac_data[i]))
     plt.legend()
-    #plt.savefig("../figures/CNN_acc_training.pdf",bbox_inches="tight",
+    #plt.savefig("../results/CNN/CNN_acc_training.pdf",bbox_inches="tight",
     #                                              pad_inches=0.1)
     plt.show()
