@@ -5,7 +5,7 @@ from PIL import Image
 from numpy import newaxis as nax
 
 class extract_data():
-    def __init__(self, path_to_data, labels, lim_data=False, from_data=False):
+    def __init__(self, path_to_data, labels, lim_data=False, from_data=False, copy_data=False):
         """
         path_to_data: contains a list of paths to data of interest
         labels: list of categories/labels
@@ -15,9 +15,9 @@ class extract_data():
         self.labels = []
         self.data = []
         self.gray_scale = False
-        run_again = True
+        self.copy_data = copy_data
 
-        if lim_data: print("Limited to %i data for each category." % lim_data)
+        #if lim_data: print("Limited to %i data for each category." % lim_data)
 
         for path, lab in zip(path_to_data, labels):
             tot_files = len(os.listdir("./"+path))
@@ -32,7 +32,7 @@ class extract_data():
 
 
         self.data = np.array(self.data)
-        self.real_data = self.data.copy()
+        if self.copy_data: self.real_data = self.data.copy()
         self.labels = np.array(self.labels)
         self.hot_vector = np.zeros((len(self.data), len(labels)))
         eye = np.eye(len(labels))
@@ -93,7 +93,7 @@ class extract_data():
         shuffle = np.linspace(0, len(self.data)-1, len(self.data)).astype("int")
         np.random.shuffle(shuffle)
         self.data = self.data[shuffle]
-        self.real_data = self.real_data[shuffle]
+        if self.copy_data: self.real_data = self.real_data[shuffle]
         self.labels = self.labels[shuffle]
         self.hot_vector = self.hot_vector[shuffle]
 
@@ -116,6 +116,7 @@ class extract_data():
             del self.data
             print("Deleted self.data")
         except: pass
+
 
         try:
             del self.real_data
@@ -154,17 +155,16 @@ if __name__ == '__main__':
                    "orange", "pear", "tomato"]
     """
 
-    paths = ["/data_images/Banana",
-             "/data_images/Tomato"]
-    true_labels = ["banana", "tomato"]
+    paths = ["/data_images/Banana"]
+    true_labels = ["banana"]
 
     tot_data = 1000
     lim_data = tot_data/len(paths)
     from_data = 0*lim_data
     test = extract_data(path_to_data=paths,
                         labels=true_labels,
-                        lim_data=1000,
-                        from_data=2000)
+                        lim_data=500,
+                        from_data=1000)
 
     #sh = 20
     #test.reshape(dat_size=sh)

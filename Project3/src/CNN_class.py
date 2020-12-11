@@ -38,15 +38,13 @@ class CNN_keras:
         First convolutional layer must contain the input shape,
         the other layers is not dependent of it
         """
-        self.model.add(Conv2D(20, (self.recf,self.recf),
+        self.model.add(Conv2D(self.nfilt, (self.recf,self.recf),
             input_shape=self.inp,activation='relu', padding = 'same'))
         self.model.add(MaxPooling2D(pool_size=(2,2)))
 
-        self.model.add(Conv2D(20, (self.recf,self.recf),
+        self.model.add(Conv2D(self.nfilt, (self.recf,self.recf),
             input_shape=self.inp,activation='relu', padding = 'same'))
         self.model.add(MaxPooling2D(pool_size=(2, 2)))
-        #self.model.add(Conv2D(2*self.nfilt, (self.recf,self.recf)))
-        #self.model.add(MaxPooling2D(pool_size=(2,2)))
 
 
         """
@@ -54,8 +52,6 @@ class CNN_keras:
         3D layers must be flatten (i.e. convert to vector form)
         """
         self.model.add(Flatten())
-        #self.model.add(Dense(2*self.nneur, activation="relu",
-        #                     kernel_regularizer=regularizers.l2(self.lmbd)))
         self.model.add(Dense(self.nneur, activation="relu",
                              kernel_regularizer=regularizers.l2(self.lmbd)))
         self.model.add(Dense(self.categories, activation="softmax",
