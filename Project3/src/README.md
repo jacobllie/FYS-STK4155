@@ -23,4 +23,4 @@ Color or Black-white [C/Bw]:
 Size of N images (N x N pixels): 
 ```
 
-Choose color (C) or gray-scale (Bw), then choose picture resolution (50 takes around 15 min).
+Choose color (C) or gray-scale (Bw), then choose picture resolution (50 pixels gray-scale takes around 20 min).
