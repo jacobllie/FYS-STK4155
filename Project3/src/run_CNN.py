@@ -244,9 +244,9 @@ CNN_accuracy_test = test_acc/runs
 
 
 # Save the train and accuracy map for plotting
-np.save("accuracy_data/acc_train_%s_and_%s_%ix%i_%i.npy" %
+np.save("../results/plotting_data/acc_train_%s_and_%s_%ix%i_%i.npy" %
        (params_name[I], params_name[J], len(param1), len(param2), t.time()),
         CNN_accuracy_train)
-np.save("accuracy_data/acc_test_%s_and_%s_%ix%i_%i.npy" %
+np.save("a../results/plotting_data/acc_test_%s_and_%s_%ix%i_%i.npy" %
        (params_name[I], params_name[J], len(param1), len(param2), t.time()),
         CNN_accuracy_test)
