@@ -4,7 +4,7 @@
 
 ## Convolutional neural networks on fruit recognition
 
-In this project, we analyse a dataset consisting of labelled images of fruit. The dataset is publically available through Kaggle [here](https://www.kaggle.com/chrisfilo/fruit-recognition). **To download the part of the dataset we use, and what is needed to run our codes:** https://easyupload.io/qa0u65
+In this project, we analyse a dataset consisting of labelled images of fruit. The dataset is publically available through Kaggle [here](https://www.kaggle.com/chrisfilo/fruit-recognition). **To download the part of the dataset we use, and what is needed to run our codes:** https://easyupload.io/qa0u65 (3.4 GB)
 
 Extract the folder **images** to the repository (Project3). If you can't access the dataset for whatever reason, or don't trust the website, contact us @ m.e.r.udnas@fys.uio.no and we'll send you a dropbox folder with the data.
 
