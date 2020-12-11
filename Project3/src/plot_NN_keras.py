@@ -14,7 +14,7 @@ FILE_NAME = "NN-keras_data.csv"
 DATA = pd.read_csv(REL_PATH + FILE_NAME)
 
 runs = DATA["runs"].values
-im_load = 71*runs
+im_load = 71*runs*0.8
 
 labels = ["Color 50x50", "B/w 50x50", "B/w 85x85"]
 
@@ -28,8 +28,7 @@ plt.legend()
 plt.tight_layout()
 plt.savefig("../results/NN/FFNN_accuracy.pdf",
             bbox_inches='tight',
-            pad_inches=0.1,
-            font_size=100)
+            pad_inches=0.1)
 plt.close()
 
 
