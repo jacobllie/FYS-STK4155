@@ -24,3 +24,19 @@ Size of N images (N x N pixels):
 ```
 
 Choose color (C) or gray-scale (Bw), then choose picture resolution (50 pixels gray-scale takes around 20 min).
+
+
+
+Analyse fruit data set with Keras convolutional neural network (faster and independent of resolution. Be aware that if resolution is too high, it may cause the memory to be fully allocated and cause the program to crash).
+
+```bash
+python3 CNN_run.py
+```
+
+You will get a set of options when running the script:
+
+- Gray-scale image [Y/n]
+- Quadratic resolution of data (N)
+- If two of the parameters \eta, \lambda, epochs and batch size should be all single valued or be a set of values [single/set] (use set of values if you want to e.g. create an accuracy map)
+
+
