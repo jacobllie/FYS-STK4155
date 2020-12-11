@@ -3,11 +3,19 @@ import matplotlib.pyplot as plt
 import seaborn as sb
 import sys
 
+gray = input("gray/color?: ")
+if gray == "gray":
+  gray = True
+elif gray == "color":
+  gray = False
+else:
+  print("Please input gray or color!")
+  sys.exit()
 
-path = "../data/"
+path = "../plotting_data/"
 
 
-create_conf_matrix = input("Analyse confidence matrix [Y/n]: ")
+create_conf_matrix = input("Analyse confusion matrix [Y/n]: ")
 
 if create_conf_matrix == "Y" or create_conf_matrix == "y":
     create_conf_matrix = True
@@ -19,25 +27,29 @@ else:
 if create_conf_matrix == True:
     true_labels = ["apple", "banana", "kiwi", "mango",
                    "orange", "pear", "tomato"]
-    conf_matrix = np.load(path+"CNN_confusion_matrix.npy")
+    if gray:
+        conf_matrix = np.load(path+"CNN_confusion_gray.npy")
+    else:
+        conf_matrix = np.load(path+"CNN_confusion_color.npy")
     heatmap = sb.heatmap(conf_matrix,cmap="viridis",
                           xticklabels=["%s" %i for i in true_labels],
                           yticklabels=["%s" %i for i in true_labels],
                           cbar_kws={'label': 'Accuracy'},
-                          fmt = ".3",
+                          fmt = ".3f",
                           edgecolor="none",
                           annot = True)
     plt.yticks(rotation=0)
     heatmap.set_xlabel("pred")
     heatmap.set_ylabel("true")
 
-    heatmap.set_title("Confusion matrix for fruit recognition")
+    heatmap.set_title("Confusion matrix for fruit recognition (Gray)")
     fig = heatmap.get_figure()
-    #fig.savefig("../figures/CNN_confusion.pdf", bbox_inches='tight',
-                                                #pad_inches=0.1)
+    #fig.savefig("../figures/CNN_confusion_gray.pdf", bbox_inches='tight',
+    #                                            pad_inches=0.1)
     plt.show()
 
 create_accuracy_matrix = input("Analyse accuracy map [Y/n]: ")
+
 
 if create_accuracy_matrix == "Y" or create_accuracy_matrix == "y":
     create_accuracy_matrix = True
@@ -47,10 +59,12 @@ else:
     print("Please input Y or n!")
     sys.exit()
 if create_accuracy_matrix == True:
-    eta = np.logspace(-4,-1.5,4)
-    lmbd = np.logspace(-4,-1.5,4)
-    runs = 5
-    accuracy_map = np.load(path+"CNN_accuracy_map.npy")
+    eta = [0.0005,0.001,0.005,0.01]
+    lmbd = [0.0001,0.0005,0.001,0.005]
+    if gray:
+        accuracy_map = np.load(path+"CNN_accuracy_map_gray.npy")
+    else:
+        accuracy_map =np.load(path+"CNN_accuracy_map_color.npy")
 
     heatmap = sb.heatmap(accuracy_map.T,cmap="viridis",
                           xticklabels=["%.4f" %i for i in eta],
@@ -90,8 +104,8 @@ if create_val_accuracy == True:
     plt.ylabel("Accuracy")
     plt.plot(frac_data,accuracy_val[:,1],"purple",label="Validation")
     plt.legend()
-    plt.savefig("../figures/CNN_val_acc_layers.pdf",bbox_inches="tight",
-                                                     pad_inches=0.1)
+    #plt.savefig("../figures/CNN_val_acc_layers.pdf",bbox_inches="tight",
+    #                                                 pad_inches=0.1)
     plt.show()
 
 create_epoch_accuracy = input("Analyse accuracy of data at different % of data trained [Y/n]: ")
@@ -114,6 +128,6 @@ if create_epoch_accuracy == True:
     for i in range(len(accuracy_epoch)):
         plt.plot(np.arange(accuracy_epoch.shape[1]),accuracy_epoch[i,:],label="{:.3}%".format(frac_data[i]))
     plt.legend()
-    plt.savefig("../figures/CNN_acc_training.pdf",bbox_inches="tight",
-                                                  pad_inches=0.1)
+    #plt.savefig("../figures/CNN_acc_training.pdf",bbox_inches="tight",
+    #                                              pad_inches=0.1)
     plt.show()
