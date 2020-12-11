@@ -5,17 +5,7 @@ import sys
 import os
 
 
-gray = input("gray/color?: ")
-if gray == "gray":
-  gray = True
-elif gray == "color":
-  gray = False
-else:
-  print("Please input gray or color!")
-  sys.exit()
-
-path = "../plotting_data/"
-
+path = "../results/plotting_data/"
 
 
 
@@ -35,6 +25,16 @@ else:
 if create_conf_matrix == True:
     true_labels = ["apple", "banana", "kiwi", "mango",
                    "orange", "pear", "tomato"]
+
+    gray = input("gray/color?: ")
+    if gray == "gray":
+      gray = True
+    elif gray == "color":
+      gray = False
+    else:
+      print("Please input gray or color!")
+      sys.exit()
+
     if gray:
         conf_matrix = np.load(path+"CNN_confusion_gray.npy")
     else:
@@ -71,16 +71,17 @@ if create_accuracy_matrix == "Y" or create_accuracy_matrix == "y":
     print("These are the current files available for making an accuracy map:")
     i = 0
     path_list = []
-    for path in os.listdir("../results/plotting_data/"):
-        if path[:3]=="acc":
-            print(i, path)
-            path_list.append(path)
+    for acc_path in os.listdir(path):
+        if acc_path[:3]=="acc":
+            print(i, acc_path)
+            path_list.append(acc_path)
             i += 1
     num = input("Please choose the file to plot by entering the corresponding integer: ")
     try:
-        acc_plot = np.load("../results/plotting_data/"+path_list[int(num)])
+        acc_plot = np.load(path+path_list[int(num)])
     except:
-        assert False, "'%s' not a valid integer! Please try again. " % num
+        print("'%s' not a valid integer! Please try again. " % num)
+        sys.exit()
 
 elif create_accuracy_matrix == "N" or create_accuracy_matrix == "n":
     create_accuracy_matrix = False
@@ -94,7 +95,7 @@ if create_accuracy_matrix == True:
         param1 = [0.0005,0.001,0.005,0.01]         # eta values
         param2 = [0.0001,0.0005,0.001,0.005]      # lambda values
         param_name = [r"$\eta$", r"$\lambda$"]
-    elif "epoch" in path_list[int(num)] and "batch" in path_list[int(num)]:
+    elif "Epochs" in path_list[int(num)] and "Batch" in path_list[int(num)]:
         param1 = [1, 3, 5, 10]                 # epoch values
         param2 = [1, 3, 5, 10]             # batch size values
         param_name = ["Epochs", "Batch size"]
@@ -152,6 +153,13 @@ if create_val_accuracy == True:
     #plt.savefig("../figures/CNN_val_acc_layers.pdf",bbox_inches="tight",
     #                                                 pad_inches=0.1)
     plt.show()
+
+
+
+
+"""
+Creating a epoch accuracy plot
+"""
 
 create_epoch_accuracy = input("Analyse accuracy of data at different % of data trained [Y/n]: ")
 
