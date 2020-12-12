@@ -1,6 +1,6 @@
 # Source Code
 
-*Add documentation*
+*Documentation*
 
 ## FFNN
 Analyse fruit data set with our FFNN neural network (slow and not recommended):
