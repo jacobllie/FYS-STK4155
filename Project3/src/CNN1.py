@@ -7,6 +7,7 @@ import time
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 from PIL import Image
+from tensorflow.keras.models import Model
 paths = ["../images/Apple",
            "../images/Banana",
            "../images/Kiwi",
@@ -92,7 +93,7 @@ else:
     eta = [0.0005,0.001,0.005,0.01]
     lmbd = [0.0001,0.0005,0.001,0.005]
 
-epochs = 10
+epochs = 5
 batch_size = 5
 """
 if im_shape is large (e.g. 200), max_data should be low (e.g. 500)
@@ -184,10 +185,7 @@ for j in range(len(eta)):
       if score_val[-1,1] > best_score:
           pred_num_label = np.argmax(pred,axis=1)
           true_num_label = np.argmax(test_data.hot_vector,axis=1)
-          print(pred_num_label)
-          print(true_num_label)
           conf_matrix = confusion_matrix(true_num_label,pred_num_label,normalize="true")
-          print(conf_matrix)
           best_score = scores[1]
 #storing the values necessary for plotting
           if create_confusion:
@@ -208,52 +206,89 @@ if create_training_accuracy:
 print("Time spent on training {:.4}s".format(trainig_time))
 
 """
-Image configuration example
+The following code is only used as a tool to visualise how filters and feature maps work. The plots are put into theory section
 """
 
+
 """
-test_path = ["/test_images"]
+import matplotlib.pyplot as plt
+test_path = ["../images/test_images"]
 test_label = ["apple"]
 
-test = extract_data(test_path, test_label, copy_data=True)
+test = extract_data(test_path, test_label)
 
+if gray: test.gray()
 
-
-test.reshape(50)
-
-
-for layer in CNN.model.layers:
-# check for convolutional layer
-if 'conv' not in layer.name:
-    continue
-# get filter weights
-filters, biases = layer.get_weights()
-print(layer.name, filters.shape)
-f_min, f_max = filters.min(), filters.max()
-filters = (filters - f_min) / (f_max - f_min)
-plt.subplot(1,4,1)
-plt.imshow(filters[:,:,:,0])
-plt.subplot(1,4,2)
-plt.imshow(filters[:,:,:,1])
-plt.subplot(1,4,3)
-plt.imshow(filters[:,:,:,2])
-plt.subplot(1,4,4)
-plt.imshow(filters[:,:,:,3])
-gray = False
-plt.figure("Reshape", figsize=(5,4))
-
-
-if gray:
-  test.gray()
-  plt.imshow(test.data[0,...,0],cmap="gray")
-  save_name = "Reshape_gray_example.pdf"
-else:
-  plt.imshow(test.data[0])
-  save_name = "Reshape_example.pdf"
-plt.title("Reshaped image (%ix%i)"%(50,50))
-
-plt.savefig(save_name)
+test.reshape(im_shape)
+plt.imshow(test.data[0],cmap="viridis")
+plt.title("Reshaped image (%ix%i)"%(im_shape,im_shape))
 
 plt.tight_layout()
+#plt.savefig("../results/CNN/CNN_test_analysis.pdf",bbox_inches="tight",
+#                                                   pad_inches=0.1)
 plt.show()
+
+
+successive_outputs = [layer.output for layer in CNN.model.layers[1:]]#visualization_model = Model(img_input, successive_outputs)
+visualization_model = Model(inputs = CNN.model.input, outputs = successive_outputs)#Load the input image
+
+x = test.data / 255
+successive_feature_maps = visualization_model.predict(x)# Retrieve are the names of the layers, so can have them as part of our plot
+layer_names = [layer.name for layer in CNN.model.layers]
+for layer_name, feature_map in zip(layer_names, successive_feature_maps):
+  print(layer_name)
+  if len(feature_map.shape) == 4:
+    n_features = feature_map.shape[-1]  # number of features in the feature map
+    size       = feature_map.shape[ 1]  # feature map shape (1, size, size, n_features)
+
+    # We will tile our images in this matrix
+    display_grid = np.zeros((size, size * n_features))
+
+    # Postprocess the feature to be visually palatable
+    for i in range(n_features):
+      x  = feature_map[0, :, :, i]
+      x -= x.mean()
+      x /= x.std ()
+      x *=  64
+      x += 128
+      x  = np.clip(x, 0, 255).astype('uint8')
+      # Tile each filter into a horizontal grid
+      display_grid[:, i * size : (i + 1) * size] = x# Display the grid
+    scale = 20. / n_features
+    if layer_name == "conv2d":
+        plt.figure( figsize=(scale * n_features, scale) )
+        plt.title ( layer_name )
+        plt.grid  ( False )
+        plt.imshow( display_grid, aspect='auto', cmap='viridis' )
+#plt.savefig("../results/CNN/CNN_feature_analysis.pdf",bbox_inches="tight",
+#                                                  pad_inches=0.1)
+plt.show()
+"""
+"""
+for layer in CNN.model.layers:
+# check for convolutional layer
+    if 'conv' not in layer.name:
+        continue
+# get filter weights
+    filters, biases = layer.get_weights()
+    print(layer.name, filters.shape)
+    f_min, f_max = filters.min(), filters.max()
+    filters = (filters - f_min) / (f_max - f_min)
+    plt.axis("off")
+    plt.subplot(141)
+    plt.imshow(filters[:,:,:,0],cmap="gist_gray")
+    plt.axis("off")
+    plt.subplot(142)
+    plt.imshow(filters[:,:,:,1],cmap="gist_gray")
+    plt.axis("off")
+    plt.subplot(143)
+    plt.imshow(filters[:,:,:,2],cmap="gist_gray")
+    plt.axis("off")
+    plt.subplot(144)
+    plt.imshow(filters[:,:,:,3],cmap="gist_gray")
+plt.tight_layout()
+#plt.savefig("../results/CNN/CNN_filter_analysis.pdf",bbox_inches="tight",
+#                                                    pad_inches=0.1)
+plt.show()
+#plt.figure("Reshape", figsize=(5,4))
 """
