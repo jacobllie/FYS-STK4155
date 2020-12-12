@@ -98,7 +98,7 @@ batch_size = 5
 if im_shape is large (e.g. 200), max_data should be low (e.g. 500)
 if im_shape is low (e.g. 50), max_data can be large (e.g. 5000)
 """
-max_data = 500
+max_data = 3000
 lim_data = int(max_data/len(paths))
 #tot_data = 0
 lens = []
@@ -142,7 +142,7 @@ for j in range(len(eta)):
                       eta = eta[j],
                       lmbd = lmbd[k])
 
-      CNN.add_layer(show_model=False)
+      CNN.add_layer(show_model=True)
 
       for i in range(runs-1):
           frac_data[i] = (i+1)*lim_data     #images trained
