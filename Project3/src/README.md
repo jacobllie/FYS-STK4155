@@ -51,7 +51,9 @@ You will get a set of options when running the script:
 
 - Gray-scale image [Y/n]
 - Quadratic resolution of data (N)
-- If two of the parameters $\eta$, $\lambda$, epochs and batch size should be all single valued or be a set of values [single/set] (use set of values if you want to e.g. create an accuracy map)
+- If two of the parameters η, λ, epochs, batch size, number of kernels or number neurons in hidden layer should be single valued or be a set of values [single/set] (use set of values if you want to e.g. create an accuracy map)
+
+If [single] is the chosen input, the parameters we be automatically adjusted to the optimal values. If [set] is chosen as input, you will be asked which two parameters you want to evaluate as a set of values.
 
 Running CNN1.py the maximum number of images that a training run can take is default 3000 images. Be sure that your RAM can handle this amount. 
 Running the program for colors, optimal learning rates and penalties and 100x100 resolution image will take approximately 5 minutes.
