@@ -88,5 +88,5 @@ Analyse validation accuracy as a function of data trained [Y/n]:
 Analyse accuracy of data at different % of data trained [Y/n]: 
 ```
 
-You will get the opportunity to save each of the plots if requested. These images are saved as ```*.pdf``` files and can be found in the folder **/results/CNN/**.
+You will get the opportunity to save each of the plots if desired. These images are saved as ```*.pdf``` files and can be found in the folder **/results/CNN/**.
 
