@@ -46,6 +46,7 @@ if create_conf_matrix == True:
                           fmt = ".3f",
                           edgecolor="none",
                           annot = True)
+    plt.xticks(rotation=45)
     plt.yticks(rotation=0)
     heatmap.set_xlabel("Prediction")
     heatmap.set_ylabel("True labelling")
@@ -54,6 +55,7 @@ if create_conf_matrix == True:
     else: heatmap.set_title("Confusion matrix for fruit recognition (Color)")
     fig = heatmap.get_figure()
 
+    plt.tight_layout()
     plt.show()
 
     save_fig = input("Save figure [Y/n]? ")
