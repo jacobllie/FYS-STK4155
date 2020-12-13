@@ -200,7 +200,7 @@ if eta_lambda == False:
         np.save("../results/plotting_data/CNN_accuracy_map_color",accuracy_map)
 if create_val_accuracy:
     np.save("../results/plotting_data/CNN_accuracy_validation",score_val)
-    np.save("..//results/plotting_data/CNN_frac_data",frac_data)
+    np.save("../results/plotting_data/CNN_frac_data",frac_data)
 if create_training_accuracy:
     np.save("../results/plotting_data/CNN_accuracy_epoch",accuracy_epoch)
 print("Time spent on training {:.4}s".format(trainig_time))
