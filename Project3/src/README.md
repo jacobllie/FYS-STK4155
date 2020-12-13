@@ -77,7 +77,7 @@ Note that the program does not plot anything, so remember to save the results yo
 
 ## Plotting
 
-If you wan to plot the results, use ```CNN_plot.py```. This script requires datafiles of format ```*.npy``` that is made from ```CNN_run.py``` and ```CNN1.py```. The datafiles are extracted from the folder **/results/plotting_data/**. There are already existing data in this folder so training models are not required for running ```CNN_plot.py```.
+If you want to plot the results produced by Convolutional Neural Network method, use ```CNN_plot.py```. This script requires datafiles of format ```*.npy``` that is made from ```CNN_run.py``` and ```CNN1.py```. The datafiles are extracted from the folder **/results/plotting_data/**. There already exists data in this folder so training models are not required for before plotting.
 
 ```bash
 python3 CNN_plot.py
