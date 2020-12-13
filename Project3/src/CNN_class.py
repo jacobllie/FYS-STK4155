@@ -8,10 +8,10 @@ class CNN_keras:
                                     n_neurons_connected, labels, eta, lmbd):
         """
         input_shape: the shape of input data
-        receptive_field: small area connected to each neuron in next layer (size of filters I think!?!?!?!?!)
-        n_filters: number of filters that is multiplied to the input image
-        n_neurons_connected:
-        labels:
+        receptive_field: size of receptive fields/kernels/filters (NxN)
+        n_filters: number of fields/kernels/filters
+        n_neurons_connected: neurons in dense layer
+        labels: labels of data to recognise
         """
 
         self.inp = input_shape

@@ -27,7 +27,8 @@ class extract_data():
                 if lim_data:
                     if i > lim_data:
                         break
-                print("Loading %s data: %i/%i      " % (lab, i+1+from_data, tot_files), end="\r")
+                print("Loading %s data: %i/%i      " %
+                      (lab, i+1+from_data, tot_files), end="\r")
         print("Loading data finished!                            ")
 
 
@@ -48,7 +49,8 @@ class extract_data():
         """
 
         if len(self.data.shape) == 1:
-            new_data = np.zeros((int(self.data.shape[0]), dat_size, dat_size, int(self.data[0].shape[-1])))
+            new_data = np.zeros((int(self.data.shape[0]), dat_size, dat_size,
+                                 int(self.data[0].shape[-1])))
             for i in range(len(self.data)):
                 x,y,_ = self.data[i].shape
                 skip_x = np.linspace(0,x-1,dat_size).astype("int")
@@ -136,61 +138,3 @@ class extract_data():
             del self.gray_scale
             print("Deleted self.gray_scale")
         except: pass
-
-
-
-
-if __name__ == '__main__':
-
-    """
-    paths = ["/data_images/Apple",
-             "/data_images/Banana",
-             "/data_images/Kiwi",
-             "/data_images/Mango",
-             "/data_images/Orange",
-             "/data_images/Pear",
-             "/data_images/Tomato"]
-    true_labels = ["apple", "banana", "kiwi", "mango",
-                   "orange", "pear", "tomato"]
-    """
-
-    paths = ["/data_images/Banana",
-             "/data_images/Tomato"]
-    true_labels = ["banana", "tomato"]
-
-    tot_data = 1000
-    lim_data = tot_data/len(paths)
-    from_data = 0*lim_data
-    test = extract_data(path_to_data=paths,
-                        labels=true_labels,
-                        lim_data=1000,
-                        from_data=2000)
-
-    #sh = 20
-    #test.reshape(dat_size=sh)
-    #test.gray()
-    #test.shuffle()
-
-
-    """
-    print("Data shape: ", test.data.shape)
-    i = 0
-    plt.imshow(test.data[i], cmap="gray")
-    plt.title("label = %s,  hot = %s" % (test.labels[i], test.hot_vector[i]))
-    plt.show()
-    plt.close()
-
-
-    #test_im = np.array(Image.open("./test_images/test_apple.png"))
-    test = extract_data(["/test_images"], ["apple"])
-    test.reshape(dat_size=sh)
-    print("Data shape: ", test.data.shape)
-
-    plt.imshow(test.data[0])
-    plt.show()
-    """
-
-
-
-
-#

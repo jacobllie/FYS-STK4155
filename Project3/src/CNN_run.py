@@ -225,10 +225,15 @@ for k in range(runs):
             if params_name[J]==params_name[2]: epochs = p2
             elif params_name[J]==params_name[3]: batch_size = p2
 
-            CNN[i*len(param2)+j].model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, verbose=1)
+            CNN[i*len(param2)+j].model.fit(X_train, y_train, epochs=epochs,
+                                           batch_size=batch_size, verbose=1)
 
-            train_acc[i,j] += CNN[i*len(param2)+j].model.evaluate(X_train, y_train, verbose=1)[1]
-            test_acc[i,j] += CNN[i*len(param2)+j].model.evaluate(X_test, y_test, verbose=1)[1]
+            train_acc[i,j] += CNN[i*len(param2)+j].model.evaluate(X_train,
+                                                                  y_train,
+                                                                  verbose=1)[1]
+            test_acc[i,j] += CNN[i*len(param2)+j].model.evaluate(X_test,
+                                                                 y_test,
+                                                                 verbose=1)[1]
             print("Train accuracy:  ", train_acc[i,j]/(k+1))
             print("Test accuracy:   ", test_acc[i,j]/(k+1))
 
