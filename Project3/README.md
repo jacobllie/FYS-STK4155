@@ -2,7 +2,7 @@
 
 *Senior developer: Jonas T. Faber, Junior developers: Jacob Lie & Elias R. Udnæs*
 
-## Convolutional neural networks on fruit recognition
+## Convolutional Neural Networks on fruit recognition
 
 In this project, we analyse a dataset consisting of labelled images of fruit. The dataset is publically available through Kaggle [here](https://www.kaggle.com/chrisfilo/fruit-recognition). **To download the part of the dataset we use, and what is needed to run our codes:** https://easyupload.io/qa0u65 (3.4 GB)
 

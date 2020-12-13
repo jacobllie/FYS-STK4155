@@ -45,13 +45,15 @@ Analyse fruit data set with Keras convolutional neural network (faster and indep
 
 ```bash
 python3 CNN_run.py
+
+Do you want to gray-scale the images [Y/n]?:
+Pleas enter the desired quadratic resolution of data
+Must be an integer. If not spesified, 50x50 will be used:
+Do you want to use a single value for all parameters [single]
+or a set of values for two parameters [set]?: 
 ```
 
-You will get a set of options when running the script:
-
-- Gray-scale image [Y/n]
-- Quadratic resolution of data (N)
-- If two of the parameters $\eta$, $\lambda$, epochs and batch size should be all single valued or be a set of values [single/set] (use set of values if you want to e.g. create an accuracy map)
+If [single] is the chosen input, the parameters we be automatically adjusted to the optimal values. If [set] is chosen as input, you will be asked which two parameters you want to evaluate as a set of values.
 
 Running CNN1.py the maximum number of images that a training run can take is default 3000 images. Be sure that your RAM can handle this amount. 
 Running the program for colors, optimal learning rates and penalties and 100x100 resolution image will take approximately 5 minutes.
@@ -74,4 +76,17 @@ Note that the program does not plot anything, so remember to save the results yo
 **For a faster run choose gray, optimal, y for the values you wish to store and a low resolution (e.g. 10 pixels).**
 
 ## Plotting
+
+If you want to plot the results produced by Convolutional Neural Network method, use ```CNN_plot.py```. This script requires datafiles of format ```*.npy``` that is made from ```CNN_run.py``` and ```CNN1.py```. The datafiles are extracted from the folder **/results/plotting_data/**. There already exists data in this folder so training models are not required for before plotting.
+
+```bash
+python3 CNN_plot.py
+
+Analyse confusion matrix [Y/n]: 
+Analyse accuracy map [Y/n]: 
+Analyse validation accuracy as a function of data trained [Y/n]:
+Analyse accuracy of data at different % of data trained [Y/n]: 
+```
+
+You will get the opportunity to save each of the plots if desired. These images are saved as ```*.pdf``` files and can be found in the folder **/results/CNN/**.
 
