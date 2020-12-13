@@ -77,3 +77,4 @@ Note that the program does not plot anything, so remember to save the results yo
 
 ## Plotting
 
+If you wan to plot the results, use ```CNN_plot.py```. This script requires datafiles of format .npy that has been saved from ```CNN_run.py``` and ```CNN1.py```. The datafiles are extracted from the folder **/results/plotting_data/**. There are already existing data in this folder so training models are not required for running ```CNN_plot.py```.
