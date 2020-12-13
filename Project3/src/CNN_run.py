@@ -16,8 +16,7 @@ true_labels = ["apple", "banana", "kiwi", "mango",
                "orange", "pear", "tomato"]
 
 
-print("Do you want to gray-scale the images [y/n]?")
-gray = input()
+gray = input("Do you want to gray-scale the images [Y/n]?: ")
 print()
 
 if gray=="y" or gray=="Y":
@@ -29,9 +28,8 @@ else:
 or N/n for coloured images." % gray
 
 
-print("Pleas enter the desired quadratic resolution of data")
-print("Must be an integer. If not spesified, 50x50 will be used:")
-shape = input()
+print("Pleas enter the desired quadratic resolution of data. ")
+shape = input("Must be an integer. If not spesified, 50x50 will be used: ")
 print()
 try:
     im_shape = int(shape)
@@ -42,26 +40,23 @@ else: data_size = (im_shape, im_shape, 3)
 
 
 
-print("Do you want to use a single value for all parameters [single] \
-or a set of values for two parameters [set] ?")
-params = input()
+params = input("Do you want to use a single value for all parameters \
+[single] or a set of values for two parameters [set]?: ")
 print()
 
 if params == "single":
     I,J = False,False
 elif params == "set":
     print("Which parameters to you want to evalute? Please use the \
-notation given below.")
+notation given below:")
     print("eta = [et]")
     print("lambda = [l]")
     print("epoch = [ep]")
     print("batch sise = [b]")
     print("receptive field = [r]")
     print("neurons in dense layer = [n]")
-    print("First parameter:")
-    par1 = input()
-    print("Second parameter:")
-    par2 = input()
+    par1 = input("First parameter: ")
+    par2 = input("Second parameter: ")
 
     """
     I and J is the index of the two parameters that
@@ -121,8 +116,8 @@ params_array contains a list of arrays. The sub-arrays
 contains a set of values for different parameters of interest
 """
 params_array = [etas, lmbds, epochss, batch_sizes, filterss, neuros_cons]
-params_name = ["eta", "lambda", "Epochs", "Batch size", "Kernel size"
-                "Neurons connected"]
+params_name = ["eta", "lambda", "Epochs", "Batch_size", "Kernel_size",
+                "Neurons_connected"]
 
 
 
@@ -133,9 +128,8 @@ if im_shape is low (e.g. 50), max_data can be large (e.g. 5000)
 (assuming you have only 8 GB of RAM)
 """
 
-#max_data = int(1e5/im_shape)
-#max_data = np.min([max_data, 3000])
-max_data=500
+max_data = int(1e5/im_shape)
+max_data = np.min([max_data, 3000])
 lim_data = int(max_data/len(paths))
 lens = []
 for path in paths:
@@ -254,5 +248,9 @@ np.save("../results/plotting_data/acc_train_%s_and_%s_%ix%i_%i.npy" %
 np.save("../results/plotting_data/acc_test_%s_and_%s_%ix%i_%i.npy" %
        (params_name[I], params_name[J], len(param1), len(param2), time_save),
         CNN_accuracy_test)
-print("Files succesfully saved in the folder '../results/plotting_data/' \
-ending with _%i.npy" % time_save)
+
+print("Files succesfully saved in the folder '../results/plotting_data/!")
+print("Saved: acc_train_%s_and_%s_%ix%i_%i.npy" %
+       (params_name[I], params_name[J], len(param1), len(param2), time_save))
+print("Saved: acc_test_%s_and_%s_%ix%i_%i.npy" %
+       (params_name[I], params_name[J], len(param1), len(param2), time_save))
