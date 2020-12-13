@@ -1,15 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from data_adjustment import extract_data
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Input, Dense, Conv2D, MaxPooling2D, Flatten
 from tensorflow.keras import optimizers, regularizers,initializers
-from tensorflow.keras.utils import to_categorical
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix
-import os
-import time
-import sys
 
 class CNN_keras:
     def __init__(self, input_shape, receptive_field, n_filters,
@@ -45,7 +37,7 @@ class CNN_keras:
         self.model.add(Conv2D(self.nfilt, (self.recf,self.recf),
             input_shape=self.inp,activation='relu', padding = 'same'))
         self.model.add(MaxPooling2D(pool_size=(2, 2)))
-        
+
 
         """
         Before we can add dense layers, the output from previous
