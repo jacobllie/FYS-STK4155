@@ -45,13 +45,13 @@ Analyse fruit data set with Keras convolutional neural network (faster and indep
 
 ```bash
 python3 CNN_run.py
+
+Do you want to gray-scale the images [Y/n]?:
+Pleas enter the desired quadratic resolution of data
+Must be an integer. If not spesified, 50x50 will be used:
+Do you want to use a single value for all parameters [single]
+or a set of values for two parameters [set]?: 
 ```
-
-You will get a set of options when running the script:
-
-- Gray-scale image [Y/n]
-- Quadratic resolution of data (N)
-- If two of the parameters η, λ, epochs, batch size, number of kernels or number neurons in hidden layer should be single valued or be a set of values [single/set] (use set of values if you want to e.g. create an accuracy map)
 
 If [single] is the chosen input, the parameters we be automatically adjusted to the optimal values. If [set] is chosen as input, you will be asked which two parameters you want to evaluate as a set of values.
 
@@ -77,4 +77,16 @@ Note that the program does not plot anything, so remember to save the results yo
 
 ## Plotting
 
-If you wan to plot the results, use ```CNN_plot.py```. This script requires datafiles of format .npy that has been saved from ```CNN_run.py``` and ```CNN1.py```. The datafiles are extracted from the folder **/results/plotting_data/**. There are already existing data in this folder so training models are not required for running ```CNN_plot.py```.
+If you wan to plot the results, use ```CNN_plot.py```. This script requires datafiles of format ```*.npy``` that is made from ```CNN_run.py``` and ```CNN1.py```. The datafiles are extracted from the folder **/results/plotting_data/**. There are already existing data in this folder so training models are not required for running ```CNN_plot.py```.
+
+```bash
+python3 CNN_plot.py
+
+Analyse confusion matrix [Y/n]: 
+Analyse accuracy map [Y/n]: 
+Analyse validation accuracy as a function of data trained [Y/n]:
+Analyse accuracy of data at different % of data trained [Y/n]: 
+```
+
+You will get the opportunity to save each of the plots if requested. These images are saved as ```*.pdf``` files and can be found in the folder **/results/CNN/**.
+
