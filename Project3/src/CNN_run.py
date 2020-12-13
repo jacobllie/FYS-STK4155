@@ -1,17 +1,17 @@
 import numpy as np
-from CNN import CNN_keras
+from CNN_class import CNN_keras
 from data_adjustment import extract_data
 from sklearn.model_selection import train_test_split
 import os
 import time as t
 
-paths = ["/data_images/Apple",
-         "/data_images/Banana",
-         "/data_images/Kiwi",
-         "/data_images/Mango",
-         "/data_images/Orange",
-         "/data_images/Pear",
-         "/data_images/Tomato"]
+paths = ["../images/Apple/",
+         "../images/Banana",
+         "../images/Kiwi",
+         "../images/Mango",
+         "../images/Orange",
+         "../images/Pear",
+         "../images/Tomatoes"]
 true_labels = ["apple", "banana", "kiwi", "mango",
                "orange", "pear", "tomato"]
 
@@ -85,12 +85,12 @@ notation given below.")
     elif par1=="n": I=5
     else: assert False, "'%s' not valid! Please insert a valid input!" % par1
 
-    if par2=="et": I=0
-    elif par2=="l": I=1
-    elif par2=="ep": I=2
-    elif par2=="b": I=3
-    elif par2=="r": I=4
-    elif par2=="n": I=5
+    if par2=="et": J=0
+    elif par2=="l": J=1
+    elif par2=="ep": J=2
+    elif par2=="b": J=3
+    elif par2=="r": J=4
+    elif par2=="n": J=5
     else: assert False, "'%s' not valid! Please insert a valid input!" % par2
 
 else:
@@ -100,19 +100,19 @@ else:
 
 
 
-eta =  [0.01]       # optimal parameters found
-lmbd = [0.0005]     # optimal parameters found
+eta =  0.01       # optimal parameters found
+lmbd = 0.0005     # optimal parameters found
 etas = [0.0005,0.001,0.005,0.01]
 lmbds = [0.0001,0.0005,0.001,0.005]
 
-epochs = [10]     # optimal parameters found
-batch_size = [5]  # optimal parameters foundx
+epochs = 10     # optimal parameters found
+batch_size = 5  # optimal parameters foundx
 epochss = [1, 3, 5, 10]
 batch_sizes = [1, 3, 5, 10]
 
-rec_field = [3]
-filters = [20]     # optimal parameters found
-neuros_con = [100]     # optimal parameters found
+rec_field = 3
+filters = 20     # optimal parameters found
+neuros_con = 100     # optimal parameters found
 filterss = [3,10,25,50]
 neuros_cons = [10,25,50,100]
 
@@ -121,8 +121,8 @@ params_array contains a list of arrays. The sub-arrays
 contains a set of values for different parameters of interest
 """
 params_array = [etas, lmbds, epochss, batch_sizes, filterss, neuros_cons]
-params_name = ["Filters", "Neurons connected", "eta", "lambda",
-               "Epochs", "Batch size"]
+params_name = ["eta", "lambda", "Epochs", "Batch size", "Kernel size"
+                "Neurons connected"]
 
 
 
@@ -132,7 +132,10 @@ if im_shape is large (e.g. 200), max_data should be low (e.g. 500)
 if im_shape is low (e.g. 50), max_data can be large (e.g. 5000)
 (assuming you have only 8 GB of RAM)
 """
-max_data = 5000
+
+#max_data = int(1e5/im_shape)
+#max_data = np.min([max_data, 3000])
+max_data=500
 lim_data = int(max_data/len(paths))
 lens = []
 for path in paths:
@@ -159,8 +162,9 @@ try:
     param1 = params_array[I]
     param2 = params_array[J]
 except:
-    param1 = params_array[0]
-    param2 = params_array[1]
+    I,J = 0,1
+    param1 = eta
+    param2 = lmbd
 
 num_models = len(param1)*len(param2)
 CNN_accuracy_train = np.zeros((len(param1), len(param2)))
@@ -170,7 +174,7 @@ test_acc = np.zeros((len(param1), len(param2)))
 
 CNN = []
 
-
+runs=1
 
 for k in range(runs):
     print("Run:   %i/%i" % (k+1,runs))
@@ -190,25 +194,24 @@ for k in range(runs):
 
     for i, p1 in enumerate(param1):
         for j, p2 in enumerate(param2):
-            print()
-            print("%s:          %s" % (params_name[I], p1))
-            print("%s:          %s" % (params_name[J], p2))
+
+            if I!=False or J!=False:
+                print()
+                print("%s:          %s" % (params_name[I], p1))
+                print("%s:          %s" % (params_name[J], p2))
 
             if int(k*num_models + i*len(param2)+j) < num_models:
 
-                if params_name[I]==params_name[0]: filters = p1
-                elif params_name[I]==params_name[1]: neuros_con = p1
-                elif params_name[I]==params_name[2]: eta = p1
-                elif params_name[I]==params_name[3]: lmbd = p1
+                if params_name[I]==params_name[0]: eta = p1
+                elif params_name[I]==params_name[1]: lmbd = p1
+                elif params_name[I]==params_name[4]: filters = p1
+                elif params_name[I]==params_name[5]: neuros_con = p1
 
-                if params_name[J]==params_name[0]: filters = p2
-                elif params_name[J]==params_name[1]: neuros_con = p2
-                elif params_name[J]==params_name[2]: eta = p2
-                elif params_name[J]==params_name[3]: lmbd = p2
+                if params_name[J]==params_name[0]: eta = p2
+                elif params_name[J]==params_name[1]: lmbd = p2
+                elif params_name[J]==params_name[4]: filters = p2
+                elif params_name[J]==params_name[5]: neuros_con = p2
 
-
-                ["Filters", "Neurons connected", "eta", "lambda",
-                               "Epochs", "Batch size"]
 
                 CNN.append(CNN_keras(input_shape=data_size,
                                      receptive_field=rec_field,
@@ -222,11 +225,11 @@ for k in range(runs):
                 else: show_model=False
                 CNN[int(i*len(param2)+j)].add_layer(show_model=show_model)
 
-            if params_name[I]==params_name[4]: epochs = p1
-            elif params_name[I]==params_name[5]: batch_size = p1
+            if params_name[I]==params_name[2]: epochs = p1
+            elif params_name[I]==params_name[3]: batch_size = p1
 
-            if params_name[J]==params_name[4]: epochs = p2
-            elif params_name[J]==params_name[5]: batch_size = p2
+            if params_name[J]==params_name[2]: epochs = p2
+            elif params_name[J]==params_name[3]: batch_size = p2
 
             CNN[i*len(param2)+j].model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, verbose=1)
 
@@ -244,9 +247,12 @@ CNN_accuracy_test = test_acc/runs
 
 
 # Save the train and accuracy map for plotting
-np.save("accuracy_data/acc_train_%s_and_%s_%ix%i_%i.npy" %
-       (params_name[I], params_name[J], len(param1), len(param2), t.time()),
+time_save = t.time()
+np.save("../results/plotting_data/acc_train_%s_and_%s_%ix%i_%i.npy" %
+       (params_name[I], params_name[J], len(param1), len(param2), time_save),
         CNN_accuracy_train)
-np.save("accuracy_data/acc_test_%s_and_%s_%ix%i_%i.npy" %
-       (params_name[I], params_name[J], len(param1), len(param2), t.time()),
+np.save("../results/plotting_data/acc_test_%s_and_%s_%ix%i_%i.npy" %
+       (params_name[I], params_name[J], len(param1), len(param2), time_save),
         CNN_accuracy_test)
+print("Files succesfully saved in the folder '../results/plotting_data/' \
+ending with _%i.npy" % time_save)

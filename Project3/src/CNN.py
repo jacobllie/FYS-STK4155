@@ -2,13 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from data_adjustment import extract_data
 from tensorflow.keras.models import Sequential
-<<<<<<< HEAD
 from tensorflow.keras.layers import Input, Dense, Conv2D, MaxPooling2D, Flatten
 from tensorflow.keras import optimizers, regularizers,initializers
-=======
-from tensorflow.keras.layers import Input, Dense, Conv2D, MaxPooling2D, Flatten, Conv3D, MaxPooling3D
-from tensorflow.keras import optimizers, regularizers
->>>>>>> 15986c542878ba213d77e11061d1887b3c80ce6b
 from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
