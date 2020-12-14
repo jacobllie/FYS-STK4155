@@ -100,6 +100,9 @@ class extract_data():
         self.hot_vector = self.hot_vector[shuffle]
 
     def flatten(self):
+        """
+        reduse the dimensionality of data into vectorised form
+        """
         if self.gray_scale:
             self.data = self.data.reshape(self.data.shape[0],
                                           self.data.shape[1]

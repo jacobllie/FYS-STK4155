@@ -13,6 +13,8 @@ class CNN_keras:
         n_neurons_connected: neurons in dense layer
         labels: labels of data to recognise
         """
+        
+        self.model = Sequential()
 
         self.inp = input_shape
         self.recf = receptive_field
@@ -22,7 +24,6 @@ class CNN_keras:
         self.eta = eta
         self.lmbd = lmbd
 
-        self.model = Sequential()
 
 
     def add_layer(self, show_model=False):

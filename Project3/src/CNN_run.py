@@ -125,7 +125,7 @@ params_name = ["eta", "lambda", "Epochs", "Batch_size", "Kernel_size",
 """
 if im_shape is large (e.g. 200), max_data should be low (e.g. 500)
 if im_shape is low (e.g. 50), max_data can be large (e.g. 5000)
-(assuming you have only 8 GB of RAM)
+(assuming you only have 8 GB of RAM)
 """
 
 max_data = int(1e5/im_shape)
