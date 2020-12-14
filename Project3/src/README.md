@@ -84,7 +84,7 @@ FFNN_plot.py
 ```
 You will get the opportunity to save the plots which will be saved in **/results/NN/** folder and **/results/Keras/** folder whether you choose to show the results from our produce NN or the Keras' NN.
 
-A plot of the accuracy map and confusion matrix will be plotted after you run the script ```fruit_NN.py``` and ```fruit_keras.py``` script.
+A plot of the confusion matrix will be made after you run the script ```fruit_NN.py``` and/or ```fruit_keras.py``` script. They will also be saved in the **/results/NN/** folder and **/results/Keras/** folder.
 
 
 
