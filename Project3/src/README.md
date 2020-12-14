@@ -77,6 +77,18 @@ Note that the program does not plot anything, so remember to save the results yo
 
 ## Plotting
 
+Use ```FFNN_plot.py``` if you want to plot the validation accuracy for our own produced FFNN and Keras' FFNN.
+
+```bash
+FFNN_plot.py
+```
+You will get the opportunity to save the plots which will be saved in **/results/NN/** folder and **/results/Keras/** folder whether you choose to show the results from our produce NN or the Keras' NN.
+
+A plot of the accuracy map and confusion matrix will be plotted after you run the script ```fruit_NN.py``` and ```fruit_keras.py``` script.
+
+
+
+
 If you want to plot the results produced by Convolutional Neural Network method, use ```CNN_plot.py```. This script requires datafiles of format ```*.npy``` that is made from ```CNN_run.py``` and ```CNN1.py```. The datafiles are extracted from the folder **/results/plotting_data/**. There already exists data in this folder so training models are not required for before plotting.
 
 ```bash
