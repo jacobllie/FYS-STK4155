@@ -18,6 +18,10 @@ paths = ["../images/Apple",
 true_labels = ["apple", "banana", "kiwi", "mango",
              "orange", "pear", "tomato"]
 
+"""
+The first lines of the code represent user interface,
+and let's the user decide certain parameters.
+"""
 gray = input("gray/color?: ")
 if gray == "gray":
   gray = True
@@ -123,6 +127,7 @@ print("Number of neurons in hidden layer  ", neuros_con)
 print("Batch size                         ", batch_size)
 print("---------------------------------------------")
 print()
+
 pred = []
 pred_labels = []
 num_label = []
@@ -133,6 +138,7 @@ frac_data = np.zeros(runs-1)
 accuracy_epoch = np.zeros((runs-1,epochs))
 best_score = 0
 start_time = time.time()
+
 for j in range(len(eta)):
   for k in range(len(lmbd)):
       CNN = CNN_keras(input_shape=data_size,
@@ -169,7 +175,10 @@ for j in range(len(eta)):
           print("Accuracy on validation data with eta = {:.4}, lambda\
                 = {:.4} is {:.4}".format(eta[j],lmbd[k],score_val[i,1]))
       trainig_time = time.time()-start_time
-      #running test data through the network
+      """
+      when all the data has been trained, test data can be run through
+      the network.
+      """
       test_data = extract_data(paths,true_labels,lim_data=lim_data,
                               from_data=runs*lim_data)
       test_data.reshape(im_shape)
@@ -181,23 +190,29 @@ for j in range(len(eta)):
       accuracy_map[j][k] = score_val[i,1]
       print("Accuracy on holy test data for lambda = {:.4},\
            eta = {:.4} is {:.4}".format(lmbd[k],eta[j],accuracy_map[j][k]))
+
 #making confusion matrix
       if score_val[-1,1] > best_score:
           pred_num_label = np.argmax(pred,axis=1)
           true_num_label = np.argmax(test_data.hot_vector,axis=1)
           conf_matrix = confusion_matrix(true_num_label,pred_num_label,normalize="true")
           best_score = scores[1]
-#storing the values necessary for plotting
+
+"""
+Storing values necessary for plotting in CNN_plot.py
+"""
           if create_confusion:
               if gray:
                   np.save("../results/plotting_data/CNN_confusion_gray",conf_matrix)
               else:
                   np.save("../results/plotting_data/CNN_confusion_color",conf_matrix)
+
 if eta_lambda == False:
     if gray:
         np.save("../results/plotting_data/CNN_accuracy_map_gray",accuracy_map)
     else:
         np.save("../results/plotting_data/CNN_accuracy_map_color",accuracy_map)
+
 if create_val_accuracy:
     np.save("../results/plotting_data/CNN_accuracy_validation",score_val)
     np.save("../results/plotting_data/CNN_frac_data",frac_data)
