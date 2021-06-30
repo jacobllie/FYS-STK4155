@@ -13,3 +13,7 @@ We use the Feed Forward Neural Network (FFNN) developed in [FYS-STK Project 2](h
 Selected results can be found under the folder **results**.
 
 Source code is found under the folder **src**, with documentation on how to run selected scripts.
+
+## Selected results
+
+![fruity](img/fruity.png){: style="width:600px"}
