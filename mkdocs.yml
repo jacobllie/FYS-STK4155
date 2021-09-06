@@ -1,0 +1,16 @@
+site_name: FYS-STK4155
+theme: flatly
+
+repo_name: meudnaes/FYS-STK4155
+repo_url: https://github.com/meudnaes/FYS-STK4155
+
+nav:
+    - Home: 'index.md'
+    - 'Project 1': 'project1.md'
+    - 'Project 2': 'project2.md'
+    - 'Project 3': 'project3.md'
+
+markdown_extensions:
+    - attr_list
+    - tables
+    
